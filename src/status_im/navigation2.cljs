@@ -12,6 +12,13 @@
   {:new-ui/reset-bottom-tabs nil
    :dispatch                 [:init-root :home-stack]})
 
+(fx/defn toggle-local-pairing-experimental-mode
+  {:events [:toggle-local-pairing-experimental-mode]}
+  [_]
+  (swap! config/local-pairing-mode-enabled? not)
+  (reloader/reload)
+  {::async-storage/set!      {:local-pairing-mode-enabled? @config/local-pairing-mode-enabled?}})
+
 (fx/defn init-root-nav2
   {:events [:init-root-nav2]}
   [_ root-id]

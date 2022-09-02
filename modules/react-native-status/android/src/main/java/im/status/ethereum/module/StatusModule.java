@@ -941,6 +941,30 @@ class StatusModule extends ReactContextBaseJavaModule implements LifecycleEventL
     }
 
     @ReactMethod
+    public void getConnectionStringForBootstrappingAnotherDevice(final String configJSON, final Callback callback) throws JSONException {
+        Log.d(TAG, "getConnectionStringForBootstrappingAnotherDevice");
+         final JSONObject jsonConfig = new JSONObject(configJSON);
+         final String keyUID = jsonConfig.getString("keyUID");
+         final String keyStorePath = this.getKeyStorePath(keyUID);
+         jsonConfig.put("keystorePath", keyStorePath);
+
+        if (!checkAvailability()) {
+            callback.invoke(false);
+            return;
+        }
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                String res = Statusgo.getConnectionStringForBootstrappingAnotherDevice(jsonConfig.toString());
+                callback.invoke(res);
+            }
+        };
+
+        StatusThreadPoolExecutor.getInstance().execute(r);
+    }
+
+    @ReactMethod
     public void hashTypedData(final String data, final Callback callback) {
         Log.d(TAG, "hashTypedData");
         if (!checkAvailability()) {

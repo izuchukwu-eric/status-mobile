@@ -153,3 +153,6 @@
 (def new-activity-center-enabled? false)
 
 (def delete-message-for-me-undo-time-limit-ms 4000)
+
+(def local-pairing-mode-enabled? (atom false))
+
