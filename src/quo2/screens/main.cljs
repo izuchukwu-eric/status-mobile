@@ -30,6 +30,7 @@
             [quo2.screens.messages.gap :as messages-gap]
             [quo2.screens.messages.system-message :as system-message]
             [quo2.screens.notifications.activity-logs :as activity-logs]
+            [quo2.screens.posts-and-attachments.messages-skeleton :as messages-skeleton]
             [quo2.screens.reactions.react :as react]
             [quo2.screens.selectors.disclaimer :as disclaimer]
             [quo2.screens.selectors.selectors :as selectors]
@@ -140,6 +141,9 @@
    :notifications [{:name      :activity-logs
                     :insets    {:top false}
                     :component activity-logs/preview-activity-logs}]
+   :posts-and-attachments [{:name      :messages-skeleton
+                            :insets    {:top false}
+                            :component messages-skeleton/preview-messages-skeleton}]
    :reactions [{:name      :react
                 :insets    {:top false}
                 :component react/preview-react}]
