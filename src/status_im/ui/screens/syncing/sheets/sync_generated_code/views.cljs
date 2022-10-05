@@ -5,7 +5,6 @@
             [quo2.components.info.information-box :as information-box]
             [status-im.ui.components.qr-code-viewer.views :as qr-code-viewer]))
 
-(def example-key "2:4FHRnp:Q4:uqnnMwVUfJc2Fkcaojet8F1ufKC3hZdGEt47joyBx9yd:BbnZ7Gc66t54a9kEFCf7FW8SGQuYypwHVeNkRYeNoqV6:3")
 (def example-key "2:5vd6SL:KFC:26gAouU6D6A4dCs9LK7jHmXZ3gjVdPczvX7yeusZRHTeR:3HxJ9Qr4H351dPoXjQYsdPX4tK6tV6TkdsHk1xMZEZmL:3")
 
 (defn views []

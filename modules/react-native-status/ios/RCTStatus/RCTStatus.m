@@ -328,9 +328,12 @@ RCT_EXPORT_METHOD(getConnectionStringForBootstrappingAnotherDevice:(NSString *)c
     NSString *keyUID = [configDict objectForKey:@"keyUID"];
     NSLog(@"keyUID is ====> %@", keyUID);
 //    NSString *keystoreDir = [@"/keystore/" stringByAppendingString:keyUID];
-    NSURL *multiaccountKeystoreDir = [self getKeyStoreDir:keyUID];
+//    NSURL *multiaccountKeystoreDir = [self getKeyStoreDir:keyUID];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *rootUrl =[[fileManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
+    NSURL *multiaccountKeystoreDir = [rootUrl URLByAppendingPathComponent:@"keystore"];
     NSString *keystoreDir = multiaccountKeystoreDir.path;
-    
+
     [configDict setValue:keystoreDir forKey:@"keystorePath"];
     NSString *modifiedConfigJSON = [configDict bv_jsonStringWithPrettyPrint:NO];
     NSLog(@"modifiedConfigJSON is ====> %@", modifiedConfigJSON);
