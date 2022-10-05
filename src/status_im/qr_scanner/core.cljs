@@ -87,6 +87,12 @@
       {:dispatch [:wallet-connect-legacy/pair data]}
       {:dispatch [:wallet-connect/pair data]})))
 
+(fx/defn handle-local-pairing
+  {:events [::handle-local-pairing-uri]}
+  [cofx data]
+      {:dispatch [:initiate-local-pairing-with-connection-string data]}
+)
+
 (fx/defn match-scan
   {:events [::match-scanned-value]}
   [cofx {:keys [type] :as data}]
@@ -98,6 +104,7 @@
     :browser        (handle-browse cofx data)
     :eip681         (handle-eip681 cofx data)
     :wallet-connect (handle-wallet-connect cofx data)
+    :localpairing   (handle-local-pairing cofx data)
     {:dispatch [:navigate-back]
      :utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
                         :on-dismiss #(re-frame/dispatch [:pop-to-root-tab :chat-stack])}}))

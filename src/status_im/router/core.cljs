@@ -224,6 +224,9 @@
       (wallet-connect/url? uri)
       (cb {:type :wallet-connect :data uri})
 
+      (string/starts-with? uri "cs")
+      (cb {:type :localpairing :data uri})
+
       :else
       (cb {:type :undefined
            :data uri}))))

@@ -1,7 +1,6 @@
 (ns status-im.ui.screens.syncing.sheets.enter-password.views
   (:require [quo.react-native :as rn]
             [status-im.ui.screens.syncing.sheets.enter-password.styles :as styles]
-;            [status-im.ui.screens.syncing.sheets.sync-generated-code :as sync-generated-code]
             [re-frame.core :as re-frame]
             [quo.core :as quo]
             [status-im.i18n.i18n :as i18n]
@@ -36,9 +35,8 @@
 (fx/defn preperations-for-connection-string
   {:events [:preperations-for-connection-string]}
   [{:keys [db]}]
-  (let [key-uid            (get-in db [:multiaccount :key-uid])
-        sha3-pwd           (ethereum/sha3 (security/safe-unmask-data @entered-password))
-        config-map         (.stringify js/JSON (clj->js {:keyUID key-uid
+  (let [sha3-pwd           (ethereum/sha3 (security/safe-unmask-data @entered-password))
+        config-map         (.stringify js/JSON (clj->js {:keyUID ""
                             :keystorePath ""
                             :password sha3-pwd}))
         connection-string  (atom "")
