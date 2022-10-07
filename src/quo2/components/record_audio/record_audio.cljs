@@ -54,7 +54,7 @@
 
 (def scale-to 2)
 (def opacity-from 0.5)
-(def signal-anim-duration 1500)
+(def signal-anim-duration 1600)
 
 (defn record-button [on-record-start on-press-release]
   [:f>
