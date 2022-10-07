@@ -3,7 +3,7 @@
             [reagent.core :as reagent]
             [clojure.string :as string]
             ["react-native-reanimated" :default reanimated
-             :refer (useSharedValue useAnimatedStyle withTiming withDelay withSpring Easing Keyframe)]))
+             :refer (useSharedValue useAnimatedStyle withTiming withDelay withSpring withRepeat Easing Keyframe cancelAnimation)]))
 
 ;; Animated Components
 (def create-animated-component (comp reagent/adapt-react-class (.-createAnimatedComponent reanimated)))
@@ -20,7 +20,9 @@
 (def with-timing withTiming)
 (def with-delay withDelay)
 (def with-spring withSpring)
+(def with-repeat withRepeat)
 (def key-frame Keyframe)
+(def cancel-animation cancelAnimation)
 
 ;; Easings
 (def bezier (.-bezier ^js Easing))
@@ -68,3 +70,7 @@
 (defn animate-shared-value-with-delay [anim val duration easing delay]
   (set-shared-value anim (with-delay delay (with-timing val (js-obj "duration" duration
                                                                     "easing"   (get easings easing))))))
+
+(defn animate-shared-value-with-delay-repeat [anim val duration easing delay repeat-times]
+  (set-shared-value anim (with-delay delay (with-repeat (with-timing val (js-obj "duration" duration
+                                                                                 "easing"   (get easings easing))) repeat-times false))))

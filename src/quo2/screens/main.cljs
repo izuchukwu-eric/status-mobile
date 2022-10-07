@@ -29,6 +29,7 @@
             [quo2.screens.messages.system-message :as system-message]
             [quo2.screens.notifications.activity-logs :as activity-logs]
             [quo2.screens.reactions.react :as react]
+            [quo2.screens.record-audio.record-audio :as record-audio]
             [quo2.screens.selectors.disclaimer :as disclaimer]
             [quo2.screens.selectors.selectors :as selectors]
             [quo2.screens.switcher.switcher-cards :as switcher-cards]
@@ -135,6 +136,9 @@
    :reactions [{:name      :react
                 :insets    {:top false}
                 :component react/preview-react}]
+   :record-audio [{:name      :record-audio
+                   :insets    {:top false}
+                   :component record-audio/preview-record-audio}]
    :switcher [{:name :switcher-cards
                :insets {:top false}
                :component switcher-cards/preview-switcher-cards}]
