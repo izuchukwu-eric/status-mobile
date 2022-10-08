@@ -968,6 +968,8 @@ class StatusModule extends ReactContextBaseJavaModule implements LifecycleEventL
             Log.d(TAG, "inputConnectionStringForBootstrapping");
              final JSONObject jsonConfig = new JSONObject(configJSON);
              final String keyStorePath = pathCombine(this.getNoBackupDirectory(), "/keystore");
+             Log.d(TAG, "keyStorePath");
+             Log.d(TAG, keyStorePath);
              jsonConfig.put("keystorePath", keyStorePath);
 
             if (!checkAvailability()) {

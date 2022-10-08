@@ -1,7 +1,10 @@
 (ns status-im.subs.onboarding
   (:require [re-frame.core :as re-frame]
             [status-im.constants :as constants]
-            [status-im.multiaccounts.recover.core :as recover]))
+            [status-im.multiaccounts.recover.core :as recover]
+            [status-im.utils.fx :as fx]
+            [status-im.native-module.core :as status]
+            [taoensso.timbre :as log]))
 
 (re-frame/reg-sub
  :intro-wizard
@@ -59,3 +62,15 @@
 (re-frame/reg-sub
  :intro-wizard/acc-to-login-keycard-pairing
  login-ma-keycard-pairing)
+
+(fx/defn initiate-local-pairing-with-connection-string
+  {:events [:initiate-local-pairing-with-connection-string]}
+  [{:keys [db]} {:keys [data]}]
+  (let [config-map         (.stringify js/JSON (clj->js {:keyUID "" :keystorePath "" :password ""}))
+        connection-string  data]
+    (status/input-connection-string-for-bootstrapping
+     connection-string
+     config-map
+     #(log/debug "this is response from initiate-local-pairing-with-connection-string " %))
+    )
+  )

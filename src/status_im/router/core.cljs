@@ -215,6 +215,9 @@
       (= handler :wallet-account)
       (cb (match-wallet-account route-params))
 
+;     (= handler :localpairing)
+;     (cb (match-wallet-account route-params))
+
       (ethereum/address? uri)
       (cb (address->eip681 uri))
 

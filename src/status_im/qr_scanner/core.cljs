@@ -9,7 +9,8 @@
             [status-im.add-new.db :as new-chat.db]
             [status-im.utils.fx :as fx]
             [status-im.group-chats.core :as group-chats]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [taoensso.timbre :as log]))
 
 (fx/defn scan-qr-code
   {:events [::scan-code]}
@@ -105,9 +106,13 @@
     :eip681         (handle-eip681 cofx data)
     :wallet-connect (handle-wallet-connect cofx data)
     :localpairing   (handle-local-pairing cofx data)
-    {:dispatch [:navigate-back]
-     :utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
-                        :on-dismiss #(re-frame/dispatch [:pop-to-root-tab :chat-stack])}}))
+     (do
+       (log/debug "type not found for " type)
+       {:dispatch [:navigate-back]
+       :utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
+                          :on-dismiss #(re-frame/dispatch [:pop-to-root-tab :chat-stack])}}
+      )
+     ))
 
 (fx/defn on-scan
   {:events [::on-scan-success]}
