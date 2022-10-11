@@ -91,6 +91,24 @@
 (def white-opa-90 (alpha white 0.9))
 (def white-opa-95 (alpha white 0.95))
 
+;;;;Black
+
+;;Solid
+(def black "#000000")
+
+;; with transparency
+(def black-opa-5 (alpha black 0.05))
+(def black-opa-10 (alpha black 0.1))
+(def black-opa-20 (alpha black 0.2))
+(def black-opa-30 (alpha black 0.3))
+(def black-opa-40 (alpha black 0.4))
+(def black-opa-50 (alpha black 0.5))
+(def black-opa-60 (alpha black 0.6))
+(def black-opa-70 (alpha black 0.7))
+(def black-opa-80 (alpha black 0.8))
+(def black-opa-90 (alpha black 0.9))
+(def black-opa-95 (alpha black 0.95))
+
 ;;;;Primary
 
 ;;Solid

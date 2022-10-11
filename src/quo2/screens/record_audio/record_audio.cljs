@@ -29,14 +29,9 @@
         [preview/customizer state descriptor]
         [rn/view {:padding-vertical 60
                   :align-items      :center}
-         [record-audio/record-button nil nil]]]])))
+         [record-audio/input-view]]]])))
 
 (defn preview-record-audio []
   [rn/view {:background-color (colors/theme-colors colors/white colors/neutral-90)
             :flex             1}
-   [rn/flat-list {:flex                      1
-                  :flex-grow                 1
-                  :nestedScrollEnabled       true
-                  :keyboardShouldPersistTaps :always
-                  :header                    [cool-preview]
-                  :key-fn                    str}]])
+   [cool-preview]])
