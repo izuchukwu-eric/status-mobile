@@ -74,3 +74,7 @@
 (defn animate-shared-value-with-delay-repeat [anim val duration easing delay repeat-times]
   (set-shared-value anim (with-delay delay (with-repeat (with-timing val (js-obj "duration" duration
                                                                                  "easing"   (get easings easing))) repeat-times false))))
+
+(defn animate-shared-value-repeat [anim val duration easing repeat-times]
+  (set-shared-value anim (with-repeat (with-timing val (js-obj "duration" duration
+                                                               "easing"   (get easings easing))) repeat-times false)))
