@@ -1,5 +1,6 @@
 (ns quo2.components.record-audio.record-audio
   (:require [quo2.components.markdown.text :as text]
+            [quo.react :as react]
             [quo.react-native :as rn]
             [quo.theme :as theme]
             [quo2.foundations.colors :as colors]
@@ -59,9 +60,9 @@
 
 (def recording-state (reagent/atom nil))
 
-(defn record-button [frame on-record-start on-press-release]
+(defn record-button [frame recording? on-record-start on-press-release]
   [:f>
-   (let [recording? (reagent/atom false)]
+   (let [recordings? (reagent/atom false)]
      (fn []
        (let [scale-1 (reanimated/use-shared-value 1)
              opacity-1 (reanimated/use-shared-value (if (= @recording-state :pause) opacity-from-lock opacity-from-default))
@@ -84,9 +85,107 @@
              opacity-animation-4 (reagent/atom nil)
              scale-animation-5 (reagent/atom nil)
              opacity-animation-5 (reagent/atom nil)
-             hit-slop-area (if @recording? 100 0)
              button-color (if (= @recording-state :pause) colors/neutral-20 colors/primary-50)
-             icon-color (if (= @recording-state :pause) colors/black colors/white)]
+             icon-color (if (= @recording-state :pause) colors/black colors/white)
+             start-animation #(do
+                                (println "start animation", @recording?)
+                              ;;  (reset! recording? true)
+                                (reset! scale-animation-1 (reanimated/animate-shared-value-repeat
+                                                           scale-1
+                                                           scale-to
+                                                           signal-anim-duration
+                                                           :linear
+                                                           -1))
+                                (reset! opacity-animation-1 (reanimated/animate-shared-value-repeat
+                                                             opacity-1
+                                                             0
+                                                             signal-anim-duration
+                                                             :linear
+                                                             -1))
+                                (reset! scale-animation-2 (reanimated/animate-shared-value-with-delay-repeat
+                                                           scale-2
+                                                           scale-to
+                                                           signal-anim-duration
+                                                           :linear
+                                                           400
+                                                           -1))
+                                (reset! opacity-animation-2 (reanimated/animate-shared-value-with-delay-repeat
+                                                             opacity-2
+                                                             0
+                                                             signal-anim-duration
+                                                             :linear
+                                                             400
+                                                             -1))
+                                (reset! scale-animation-3 (reanimated/animate-shared-value-with-delay-repeat
+                                                           scale-3
+                                                           scale-to
+                                                           signal-anim-duration
+                                                           :linear
+                                                           800
+                                                           -1))
+                                (reset! opacity-animation-3 (reanimated/animate-shared-value-with-delay-repeat
+                                                             opacity-3
+                                                             0
+                                                             signal-anim-duration
+                                                             :linear
+                                                             800
+                                                             -1))
+                                (reset! scale-animation-4 (reanimated/animate-shared-value-with-delay-repeat
+                                                           scale-4
+                                                           scale-to
+                                                           signal-anim-duration
+                                                           :linear
+                                                           1200
+                                                           -1))
+                                (reset! opacity-animation-4 (reanimated/animate-shared-value-with-delay-repeat
+                                                             opacity-4
+                                                             0
+                                                             signal-anim-duration
+                                                             :linear
+                                                             1200
+                                                             -1))
+                                (reset! scale-animation-5 (reanimated/animate-shared-value-with-delay-repeat
+                                                           scale-5
+                                                           scale-to
+                                                           signal-anim-duration
+                                                           :linear
+                                                           1600
+                                                           -1))
+                                (reset! opacity-animation-5 (reanimated/animate-shared-value-with-delay-repeat
+                                                             opacity-5
+                                                             0
+                                                             signal-anim-duration
+                                                             :linear
+                                                             1600
+                                                             -1)))
+             stop-animation #(do
+                               (println "finish animation" @scale-animation-1 @recording?)
+                               (reset! recording? false)
+                               (reanimated/cancel-animation scale-1)
+                               (reanimated/set-shared-value scale-1 1)
+                               (reanimated/cancel-animation opacity-1)
+                               (reanimated/set-shared-value opacity-1 (if (= @recording-state :pause) opacity-from-lock opacity-from-default))
+
+                               (reanimated/cancel-animation scale-2)
+                               (reanimated/set-shared-value scale-2 1)
+                               (reanimated/cancel-animation opacity-2)
+                               (reanimated/set-shared-value opacity-2 (if (= @recording-state :pause) opacity-from-lock opacity-from-default))
+
+                               (reanimated/cancel-animation scale-3)
+                               (reanimated/set-shared-value scale-3 1)
+                               (reanimated/cancel-animation opacity-3)
+                               (reanimated/set-shared-value opacity-3 (if (= @recording-state :pause) opacity-from-lock opacity-from-default))
+
+                               (reanimated/cancel-animation scale-4)
+                               (reanimated/set-shared-value scale-4 1)
+                               (reanimated/cancel-animation opacity-4)
+                               (reanimated/set-shared-value opacity-4 (if (= @recording-state :pause) opacity-from-lock opacity-from-default))
+
+                               (reanimated/cancel-animation scale-5)
+                               (reanimated/set-shared-value scale-5 1)
+                               (reanimated/cancel-animation opacity-5)
+                               (reanimated/set-shared-value opacity-5 (if (= @recording-state :pause) opacity-from-lock opacity-from-default)))]
+         (quo.react/effect! #(if @recording? (start-animation) (stop-animation)) [@recording?])
          [rn/view {:style {:position :absolute
                            :bottom 0
                            :right 0
@@ -111,10 +210,6 @@
                                          :justify-content :center
                                          :align-items :center}
                                  :active-opacity 1
-                                 :hit-slop {:top    hit-slop-area
-                                            :left   hit-slop-area
-                                            :right  hit-slop-area
-                                            :bottom hit-slop-area}
                                  :on-press-outt #(do
                                                   (println "finish animation" @scale-animation-1 @recording?)
                                                   (reset! recording? false)
@@ -287,11 +382,11 @@
                                                                                 {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
                                                                                 @delete-button-frame))
                                               (println "LOCK BUTTON PRESSED" (touch-inside-layout?
-                                                                                {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
-                                                                                @lock-button-frame))
+                                                                              {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
+                                                                              @lock-button-frame))
                                               (println "SEND BUTTON PRESSED" (touch-inside-layout?
-                                                                                {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
-                                                                                @send-button-frame))
+                                                                              {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
+                                                                              @send-button-frame))
                                               (println "RECORD BUTTON PRESSED" (touch-inside-layout?
                                                                                 {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
                                                                                 @record-button-frame))
@@ -301,15 +396,18 @@
                                               true)
              :on-responder-move (fn [^js e]
                                   (println "MOVED TO LOCK BUTTON" (touch-inside-layout?
-                                                                  {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
-                                                                  @lock-button-frame))
+                                                                   {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
+                                                                   @lock-button-frame))
                                   (println "MOVED TO SEND BUTTON" (touch-inside-layout?
-                                                                  {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
-                                                                  @send-button-frame))
+                                                                   {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
+                                                                   @send-button-frame))
                                   (println "MOVED TO DELETE BUTTON" (touch-inside-layout?
-                                                                    {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
-                                                                    @delete-button-frame))
-                                  (println (js->clj (-> e .-nativeEvent.locationX) :keywordize-keys true)))}
+                                                                     {:locationX (-> e .-nativeEvent.locationX) :locationY (-> e .-nativeEvent.locationY)}
+                                                                     @delete-button-frame))
+                                  (println (js->clj (-> e .-nativeEvent.locationX) :keywordize-keys true)))
+             :on-responder-release (fn [^js e]
+                                     (reset! recording? false)
+                                     (println (js->clj (-> e .-nativeEvent.locationX) :keywordize-keys true)))}
    [delete-button delete-button-frame]
    [lock-button lock-button-frame]
    [send-button send-button-frame]
