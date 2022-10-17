@@ -49,6 +49,7 @@
 ;;80 with transparency
 (def neutral-80-opa-5  (alpha neutral-80 0.05))
 (def neutral-80-opa-10 (alpha neutral-80 0.1))
+(def neutral-80-opa-15 (alpha neutral-80 0.15))
 (def neutral-80-opa-20 (alpha neutral-80 0.2))
 (def neutral-80-opa-30 (alpha neutral-80 0.3))
 (def neutral-80-opa-40 (alpha neutral-80 0.4))
