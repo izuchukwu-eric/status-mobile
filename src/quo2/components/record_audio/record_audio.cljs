@@ -85,203 +85,72 @@
           ;;  translate-x-animation (reagent/atom nil)
            translate-y (reanimated/use-shared-value 0)
            translate-x (reanimated/use-shared-value 0)
-           button-color (cond
-                          @ready-to-lock? colors/neutral-30
-                          @ready-to-delete? colors/danger-50
-                          :else colors/primary-50)
+           rings-color (cond
+                         @ready-to-lock? colors/neutral-30
+                         @ready-to-delete? colors/danger-50
+                         :else colors/primary-50)
+           button-color colors/primary-50
            icon-color (if @ready-to-lock? colors/black colors/white)
            icon-opacity (reanimated/use-shared-value 1)
            red-overlay-opacity (reanimated/use-shared-value 0)
            gray-overlay-opacity (reanimated/use-shared-value 0)
-           start-animation #(do
-                              (reanimated/animate-shared-value-repeat
-                               scale-1
-                               scale-to
-                               signal-anim-duration
-                               :linear
-                               -1)
-                              (reanimated/animate-shared-value-repeat
-                               opacity-1
-                               0
-                               signal-anim-duration
-                               :linear
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               scale-2
-                               scale-to
-                               signal-anim-duration
-                               :linear
-                               400
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               opacity-2
-                               0
-                               signal-anim-duration
-                               :linear
-                               400
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               scale-3
-                               scale-to
-                               signal-anim-duration
-                               :linear
-                               800
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               opacity-3
-                               0
-                               signal-anim-duration
-                               :linear
-                               800
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               scale-4
-                               scale-to
-                               signal-anim-duration
-                               :linear
-                               1200
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               opacity-4
-                               0
-                               signal-anim-duration
-                               :linear
-                               1200
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               scale-5
-                               scale-to
-                               signal-anim-duration
-                               :linear
-                               1600
-                               -1)
-                              (reanimated/animate-shared-value-with-delay-repeat
-                               opacity-5
-                               0
-                               signal-anim-duration
-                               :linear
-                               1600
-                               -1))
-           stop-animation #(do
-                             (reanimated/cancel-animation scale-1)
-                             (reanimated/set-shared-value scale-1 1)
-                             (reanimated/cancel-animation opacity-1)
-                             (reanimated/set-shared-value opacity-1 (if @ready-to-lock? opacity-from-lock opacity-from-default))
-                             (reanimated/cancel-animation scale-2)
-                             (reanimated/set-shared-value scale-2 1)
-                             (reanimated/cancel-animation opacity-2)
-                             (reanimated/set-shared-value opacity-2 (if @ready-to-lock? opacity-from-lock opacity-from-default))
-                             (reanimated/cancel-animation scale-3)
-                             (reanimated/set-shared-value scale-3 1)
-                             (reanimated/cancel-animation opacity-3)
-                             (reanimated/set-shared-value opacity-3 (if @ready-to-lock? opacity-from-lock opacity-from-default))
-                             (reanimated/cancel-animation scale-4)
-                             (reanimated/set-shared-value scale-4 1)
-                             (reanimated/cancel-animation opacity-4)
-                             (reanimated/set-shared-value opacity-4 (if @ready-to-lock? opacity-from-lock opacity-from-default))
-                             (reanimated/cancel-animation scale-5)
-                             (reanimated/set-shared-value scale-5 1)
-                             (reanimated/cancel-animation opacity-5)
-                             (reanimated/set-shared-value opacity-5 (if @ready-to-lock? opacity-from-lock opacity-from-default)))
-           start-y-animation #(do
-                                (reanimated/animate-shared-value-with-timing
-                                 translate-y
-                                 -64
-                                 1000
-                                 :easing1)
-                                (reanimated/animate-shared-value-with-delay
-                                 icon-opacity
-                                 0
-                                 200
-                                 :linear
-                                 400))
-           reset-y-animation #(do
-                                (reanimated/animate-shared-value-with-timing
-                                 translate-y
-                                 0
-                                 300
-                                 :easing1)
-                                (reanimated/animate-shared-value-with-timing
-                                 icon-opacity
-                                 1
-                                 500
-                                 :linear))
-           start-x-animation #(do
-                                (reanimated/animate-shared-value-with-timing
-                                 translate-x
-                                 -64
-                                 1000
-                                 :easing1)
-                                (reanimated/animate-shared-value-with-delay
-                                 icon-opacity
-                                 0
-                                 200
-                                 :linear
-                                 400)
-                                (reanimated/animate-shared-value-with-timing
-                                 red-overlay-opacity
-                                 1
-                                 500
-                                 :linear))
-           reset-x-animation #(do
-                                (reanimated/animate-shared-value-with-timing
-                                 translate-x
-                                 0
-                                 300
-                                 :easing1)
-                                (reanimated/animate-shared-value-with-timing
-                                 icon-opacity
-                                 1
-                                 500
-                                 :linear)
-                                (reanimated/animate-shared-value-with-timing
-                                 red-overlay-opacity
-                                 0
-                                 100
-                                 :linear))
-           start-x-y-animation #(do
-                                  (reanimated/animate-shared-value-with-timing
-                                   translate-y
-                                   -44
-                                   1000
-                                   :easing1)
-                                  (reanimated/animate-shared-value-with-timing
-                                   translate-x
-                                   -44
-                                   1000
-                                   :easing1)
-                                  (reanimated/animate-shared-value-with-delay
-                                   icon-opacity
-                                   0
-                                   200
-                                   :linear
-                                   300)
-                                  (reanimated/animate-shared-value-with-timing
-                                   gray-overlay-opacity
-                                   1
-                                   300
-                                   :linear))
-           reset-x-y-animation #(do
-                                  (reanimated/animate-shared-value-with-timing
-                                   translate-y
-                                   0
-                                   300
-                                   :easing1)
-                                  (reanimated/animate-shared-value-with-timing
-                                   translate-x
-                                   0
-                                   300
-                                   :easing1)
-                                  (reanimated/animate-shared-value-with-timing
-                                   icon-opacity
-                                   1
-                                   500
-                                   :linear)
-                                  (reanimated/animate-shared-value-with-timing
-                                   gray-overlay-opacity
-                                   0
-                                   800
-                                   :linear))]
+           start-animation (fn []
+                             (println "SIGNAL ANIM")
+                             (reanimated/animate-shared-value-repeat scale-1 scale-to signal-anim-duration :linear -1)
+                             (reanimated/animate-shared-value-repeat opacity-1 0 signal-anim-duration :linear -1)
+                             (reanimated/animate-shared-value-with-delay-repeat scale-2 scale-to signal-anim-duration :linear 400 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat opacity-2 0 signal-anim-duration :linear 400 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat scale-3 scale-to signal-anim-duration :linear 800 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat opacity-3 0 signal-anim-duration :linear 800 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat scale-4 scale-to signal-anim-duration :linear 1200 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat opacity-4 0 signal-anim-duration :linear 1200 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat scale-5 scale-to signal-anim-duration :linear 1600 -1)
+                             (reanimated/animate-shared-value-with-delay-repeat opacity-5 0 signal-anim-duration :linear 1600 -1))
+           stop-animation (fn []
+                            (reanimated/cancel-animation scale-1)
+                            (reanimated/set-shared-value scale-1 1)
+                            (reanimated/cancel-animation opacity-1)
+                            (reanimated/set-shared-value opacity-1 (if @ready-to-lock? opacity-from-lock opacity-from-default))
+                            (reanimated/cancel-animation scale-2)
+                            (reanimated/set-shared-value scale-2 1)
+                            (reanimated/cancel-animation opacity-2)
+                            (reanimated/set-shared-value opacity-2 (if @ready-to-lock? opacity-from-lock opacity-from-default))
+                            (reanimated/cancel-animation scale-3)
+                            (reanimated/set-shared-value scale-3 1)
+                            (reanimated/cancel-animation opacity-3)
+                            (reanimated/set-shared-value opacity-3 (if @ready-to-lock? opacity-from-lock opacity-from-default))
+                            (reanimated/cancel-animation scale-4)
+                            (reanimated/set-shared-value scale-4 1)
+                            (reanimated/cancel-animation opacity-4)
+                            (reanimated/set-shared-value opacity-4 (if @ready-to-lock? opacity-from-lock opacity-from-default))
+                            (reanimated/cancel-animation scale-5)
+                            (reanimated/set-shared-value scale-5 1)
+                            (reanimated/cancel-animation opacity-5)
+                            (reanimated/set-shared-value opacity-5 (if @ready-to-lock? opacity-from-lock opacity-from-default)))
+           start-y-animation (fn []
+                               (reanimated/animate-shared-value-with-timing translate-y -64 1000 :easing1)
+                               (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 400))
+           reset-y-animation (fn []
+                               (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
+                               (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear))
+           start-x-animation (fn []
+                               (reanimated/animate-shared-value-with-timing translate-x -64 1000 :easing1)
+                               (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 400)
+                               (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 500 :linear))
+           reset-x-animation (fn []
+                               (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
+                               (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
+                               (reanimated/animate-shared-value-with-timing red-overlay-opacity 0 100 :linear))
+           start-x-y-animation (fn []
+                                 (reanimated/animate-shared-value-with-timing translate-y -44 1000 :easing1)
+                                 (reanimated/animate-shared-value-with-timing translate-x -44 1000 :easing1)
+                                 (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
+                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 300 :linear))
+           reset-x-y-animation (fn []
+                                 (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
+                                 (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
+                                 (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
+                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear))]
        (quo.react/effect! #(if @recording? (start-animation) (when-not @ready-to-lock? (stop-animation))) [@recording?])
        (quo.react/effect! #(if @ready-to-lock? (start-x-y-animation) (reset-x-y-animation)) [@ready-to-lock?])
        (quo.react/effect! #(if @ready-to-send? (start-y-animation) (reset-y-animation)) [@ready-to-send?])
@@ -301,11 +170,11 @@
                          :on-layout (fn [^js e]
                                       (reset! frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
         [:<>
-         [reanimated/view {:style (signal-circle-apply-animations scale-1 opacity-1 button-color)}]
-         [reanimated/view {:style (signal-circle-apply-animations scale-2 opacity-2 button-color)}]
-         [reanimated/view {:style (signal-circle-apply-animations scale-3 opacity-3 button-color)}]
-         [reanimated/view {:style (signal-circle-apply-animations scale-4 opacity-4 button-color)}]
-         [reanimated/view {:style (signal-circle-apply-animations scale-5 opacity-5 button-color)}]]
+         [reanimated/view {:style (signal-circle-apply-animations scale-1 opacity-1 rings-color)}]
+         [reanimated/view {:style (signal-circle-apply-animations scale-2 opacity-2 rings-color)}]
+         [reanimated/view {:style (signal-circle-apply-animations scale-3 opacity-3 rings-color)}]
+         [reanimated/view {:style (signal-circle-apply-animations scale-4 opacity-4 rings-color)}]
+         [reanimated/view {:style (signal-circle-apply-animations scale-5 opacity-5 rings-color)}]]
         [rn/view {:style {:width  56
                           :height 56
                           :border-radius 28
