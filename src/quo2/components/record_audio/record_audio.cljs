@@ -107,6 +107,7 @@
                              (reanimated/animate-shared-value-with-delay-repeat scale-5 scale-to signal-anim-duration :linear 1600 -1)
                              (reanimated/animate-shared-value-with-delay-repeat opacity-5 0 signal-anim-duration :linear 1600 -1))
            stop-animation (fn []
+                            (println "CANCEL SIGN ANIM")
                             (reanimated/cancel-animation scale-1)
                             (reanimated/set-shared-value scale-1 1)
                             (reanimated/cancel-animation opacity-1)
@@ -134,9 +135,9 @@
                                (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
                                (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear))
            start-x-animation (fn []
-                               (reanimated/animate-shared-value-with-timing translate-x -64 1000 :easing1)
-                               (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 400)
-                               (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 500 :linear))
+                               (reanimated/animate-shared-value-with-timing translate-x -64 1500 :easing1)
+                               (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700)
+                               (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 200 :linear))
            reset-x-animation (fn []
                                (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
                                (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
@@ -145,13 +146,13 @@
                                  (reanimated/animate-shared-value-with-timing translate-y -44 1000 :easing1)
                                  (reanimated/animate-shared-value-with-timing translate-x -44 1000 :easing1)
                                  (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
-                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 300 :linear))
+                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 200 :linear))
            reset-x-y-animation (fn []
                                  (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
                                  (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
                                  (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear))]
-       (quo.react/effect! #(if @recording? (start-animation) (when-not @ready-to-lock? (stop-animation))) [@recording?])
+       (quo.react/effect! #(do (println "FDSFDSFDSFDSDS") (if @recording? (start-animation) (when-not @ready-to-lock? (stop-animation)))) [@recording?])
        (quo.react/effect! #(if @ready-to-lock? (start-x-y-animation) (reset-x-y-animation)) [@ready-to-lock?])
        (quo.react/effect! #(if @ready-to-send? (start-y-animation) (reset-y-animation)) [@ready-to-send?])
        (quo.react/effect! #(if @ready-to-delete? (start-x-animation) (reset-x-animation)) [@ready-to-delete?])
@@ -208,25 +209,27 @@
   [:f>
    (fn []
      (let [translate-y (reanimated/use-shared-value 0)
-           start-y-animation #(reanimated/animate-shared-value-with-delay
-                               translate-y
-                               12
-                               200
-                               :linear
-                               500)
-           reset-y-animation #(reanimated/animate-shared-value-with-timing
-                               translate-y
-                               0
-                               100
-                               :linear)]
+           start-y-animation #(do
+                                (reanimated/animate-shared-value-with-delay
+                                 translate-y
+                                 12
+                                 200
+                                 :linear
+                                 400))
+           reset-y-animation #(do
+                                (reanimated/animate-shared-value-with-timing
+                                 translate-y
+                                 0
+                                 200
+                                 :linear))]
        (quo.react/effect! #(if @ready-to-send? (start-y-animation) (reset-y-animation)) [@ready-to-send?])
        [reanimated/view {:style (reanimated/apply-animations-to-style
                                  {:transform   [{:translateY translate-y}]}
-                                 {:width            32
-                                  :height           32
-                                  :justify-content  :center
+                                 {:justify-content  :center
                                   :align-items      :center
                                   :background-color colors/primary-50
+                                  :width            32
+                                  :height           32
                                   :border-radius    16
                                   :position         :absolute
                                   :top              0
@@ -295,35 +298,63 @@
   [:f>
    (fn []
      (let [translate-x (reanimated/use-shared-value 0)
-           start-x-animation #(reanimated/animate-shared-value-with-delay
-                               translate-x
-                               12
-                               200
-                               :linear
-                               500)
-           reset-x-animation #(reanimated/animate-shared-value-with-timing
-                               translate-x
-                               0
-                               100
-                               :linear)]
-       (quo.react/effect! #(if @ready-to-delete? (start-x-animation) (reset-x-animation)) [@ready-to-delete?])
-       [reanimated/view {:style (reanimated/apply-animations-to-style
-                                 {:transform   [{:translateX translate-x}]}
-                                 {:width            32
-                                  :height           32
-                                  :justify-content  :center
-                                  :align-items      :center
-                                  :background-color colors/danger-50
-                                  :border-radius    16
-                                  :position         :absolute
-                                  :top              76
-                                  :left             0
-                                  :z-index          11})
-                         :pointer-events :none
-                         :on-layout (fn [^js e]
-                                      (reset! frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
-        [icons/icon :main-icons2/delete-context {:color colors/white
-                                                 :size  20}]]))])
+           connector-opacity (reanimated/use-shared-value 0)
+           width (reanimated/use-shared-value 24)
+           height (reanimated/use-shared-value 12)
+           border-radius (reanimated/use-shared-value 8)
+           border-radius-2 (reanimated/use-shared-value 8)
+           start-x-animation #((reanimated/animate-shared-value-with-delay translate-x 12 300 :linear 800)
+                               (reanimated/animate-shared-value-with-delay connector-opacity 1 0 :easing1 480)
+                               (reanimated/animate-shared-value-with-delay width 56 500 :easing1 480)
+                               (reanimated/animate-shared-value-with-delay height 56 500 :easing1 480)
+                               (reanimated/animate-shared-value-with-delay border-radius 28 500 :easing1 480)
+                               (reanimated/animate-shared-value-with-delay border-radius-2 28 500 :easing1 480))
+           reset-x-animation #(do
+                                (reanimated/animate-shared-value-with-timing translate-x 0 100 :linear)
+                                (reanimated/set-shared-value connector-opacity 0)
+                                (reanimated/set-shared-value width 24)
+                                (reanimated/set-shared-value height 12)
+                                (reanimated/set-shared-value border-radius 8)
+                                (reanimated/set-shared-value border-radius-2 16))]
+       (quo.react/effect! #(do (reset-x-animation) (when @ready-to-delete? (start-x-animation))) [@ready-to-delete?])
+       [:<>
+        [rn/view {:style {:justify-content :center
+                          :align-items :center
+                          :position         :absolute
+                          :width 56
+                          :height 56
+                          :bottom 20
+                          :left 0}}
+         [reanimated/view {:style (reanimated/apply-animations-to-style
+                                   {:opacity                    connector-opacity
+                                    :width                      width
+                                    :height                     height
+                                    :border-bottom-left-radius  border-radius
+                                    :border-top-left-radius     border-radius
+                                    :border-top-right-radius    border-radius-2
+                                    :border-bottom-right-radius border-radius-2}
+                                   {:justify-content  :center
+                                    :align-items      :center
+                                    :align-self :center
+                                    :background-color colors/danger-50
+                                    :z-index          0})}]]
+        [reanimated/view {:style (reanimated/apply-animations-to-style
+                                  {:transform        [{:translateX translate-x}]}
+                                  {:width            32
+                                   :height           32
+                                   :justify-content  :center
+                                   :align-items      :center
+                                   :background-color colors/danger-50
+                                   :border-radius    16
+                                   :position         :absolute
+                                   :top              76
+                                   :left             0
+                                   :z-index          11})
+                          :pointer-events :none
+                          :on-layout (fn [^js e]
+                                       (reset! frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
+         [icons/icon :main-icons2/delete-context {:color colors/white
+                                                  :size  20}]]]))])
 
 (defn touch-inside-layout? [{:keys [locationX locationY]} {:keys [width height x y]}]
   (let [max-x (+ x width)
