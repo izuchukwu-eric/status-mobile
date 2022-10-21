@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useDerivedValue, withTiming, withSequence, withDelay, Easing } from 'react-native-reanimated';
+=======
+import { useDerivedValue, interpolate } from 'react-native-reanimated';
+>>>>>>> 08f5216de (attempt to fix rings re-render problem, no success so far)
 
 // Generic Worklets
 
@@ -125,6 +129,24 @@ export function homeStackScale (homeStackOpen, minimizeScale) {
     function () {
       'worklet'
       return withTiming(homeStackOpen.value ? 1 : minimizeScale, defaultDurationAndEasing);
+    }
+  );
+}
+
+export function audioRecorderRingScale (scale, multiplier) {
+  return useDerivedValue(
+    function () {
+      'worklet'
+      return scale.value * multiplier;
+    }
+  );
+}
+
+export function interpolateValue(sharedValue, inputRange, outputRange) {
+  return useDerivedValue(
+    function () {
+      'worklet'
+      return interpolate(sharedValue.value, inputRange, outputRange);
     }
   );
 }

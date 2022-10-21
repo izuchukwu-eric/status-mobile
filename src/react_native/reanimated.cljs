@@ -3,7 +3,9 @@
             [reagent.core :as reagent]
             [clojure.string :as string]
             ["react-native-reanimated" :default reanimated
-             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat withSequence Easing Keyframe cancelAnimation)]))
+             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat withSequence Easing Keyframe cancelAnimation)])
+  (:require-macros [quo.react :refer [with-deps-check
+                                      maybe-js-deps]]))
 
 ;; Animated Components
 (def create-animated-component (comp reagent/adapt-react-class (.-createAnimatedComponent reanimated)))
@@ -15,8 +17,12 @@
 ;; Hooks 
 (def use-shared-value useSharedValue)
 (def use-animated-style useAnimatedStyle)
-(def use-derived-value useDerivedValue)
 (def use-animated-reaction useAnimatedReaction)
+
+(defn use-derived-value
+  ([f] (useDerivedValue f))
+  ([f deps]
+   (useDerivedValue f deps)))
 
 ;; Animations
 (def with-timing withTiming)
@@ -55,6 +61,14 @@
 ;; Worklets
 (def worklet-factory (js/require "../src/js/worklet_factory.js"))
 
+;; Interpolate
+
+(defn use-interpolate [shared-value input-range output-range]
+  (.interpolateValue ^js worklet-factory
+                     shared-value
+                     (clj->js input-range)
+                     (clj->js output-range)))
+
 ;;;; Component Animations
 
 ;; kebab-case styles are not working for worklets
@@ -64,6 +78,9 @@
         style      (apply dissoc (map-keys kebab-case->camelCase style) (keys animations))]
     (use-animated-style
      (.applyAnimationsToStyle ^js worklet-factory (clj->js animations) (clj->js style)))))
+
+(defn apply-memoized-animations-to-style [animations style]
+  (memoize (apply-animations-to-style animations style)))
 
 ;; Animators
 (defn animate-shared-value-with-timing [anim val duration easing]

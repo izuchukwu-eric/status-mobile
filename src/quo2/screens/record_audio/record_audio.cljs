@@ -10,12 +10,11 @@
 (defn cool-preview []
   (let [state (reagent/atom {})]
     (fn []
-      [rn/touchable-without-feedback {:on-press rn/dismiss-keyboard!}
-       [rn/view {:padding-bottom 150}
-        [preview/customizer state descriptor]
-        [rn/view {:padding-vertical 60
-                  :align-items      :center}
-         [record-audio/input-view]]]])))
+      [rn/view {:padding-bottom 150}
+       [preview/customizer state descriptor]
+       [rn/view {:padding-vertical 60
+                 :align-items      :center}
+        [record-audio/input-view]]])))
 
 (defn preview-record-audio []
   [rn/view {:background-color (colors/theme-colors colors/white colors/neutral-90)
