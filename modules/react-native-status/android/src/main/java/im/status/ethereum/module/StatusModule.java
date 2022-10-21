@@ -944,7 +944,9 @@ class StatusModule extends ReactContextBaseJavaModule implements LifecycleEventL
     public void getConnectionStringForBootstrappingAnotherDevice(final String configJSON, final Callback callback) throws JSONException {
         Log.d(TAG, "getConnectionStringForBootstrappingAnotherDevice");
          final JSONObject jsonConfig = new JSONObject(configJSON);
-         final String keyStorePath = pathCombine(this.getNoBackupDirectory(), "/keystore");
+         final String keyUID = jsonConfig.getString("keyUID");
+         final String keyStorePath = this.getKeyStorePath(keyUID);
+//          final String keyStorePath = pathCombine(this.getNoBackupDirectory(), "/keystore");
          jsonConfig.put("keystorePath", keyStorePath);
 
         if (!checkAvailability()) {

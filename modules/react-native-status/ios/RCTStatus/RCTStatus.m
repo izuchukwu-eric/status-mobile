@@ -325,13 +325,13 @@ RCT_EXPORT_METHOD(getConnectionStringForBootstrappingAnotherDevice:(NSString *)c
     NSData *configData = [configJSON dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *configDict = [NSJSONSerialization JSONObjectWithData:configData options:NSJSONReadingMutableContainers error:nil];
     NSLog(@"configDict is ====> %@", configDict);
-//     NSString *keyUID = [configDict objectForKey:@"keyUID"];
-//     NSLog(@"keyUID is ====> %@", keyUID);
+    NSString *keyUID = [configDict objectForKey:@"keyUID"];
+    NSLog(@"keyUID is ====> %@", keyUID);
 //    NSString *keystoreDir = [@"/keystore/" stringByAppendingString:keyUID];
-//    NSURL *multiaccountKeystoreDir = [self getKeyStoreDir:keyUID];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *rootUrl =[[fileManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
-    NSURL *multiaccountKeystoreDir = [rootUrl URLByAppendingPathComponent:@"keystore"];
+   NSURL *multiaccountKeystoreDir = [self getKeyStoreDir:keyUID];
+//     NSFileManager *fileManager = [NSFileManager defaultManager];
+//     NSURL *rootUrl =[[fileManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
+//     NSURL *multiaccountKeystoreDir = [rootUrl URLByAppendingPathComponent:@"keystore"];
     NSString *keystoreDir = multiaccountKeystoreDir.path;
 
     [configDict setValue:keystoreDir forKey:@"keystorePath"];

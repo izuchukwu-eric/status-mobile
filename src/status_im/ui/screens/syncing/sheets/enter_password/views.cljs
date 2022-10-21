@@ -66,7 +66,8 @@
   {:events [:preperations-for-connection-string]}
   [{:keys [db]}]
   (let [sha3-pwd           (ethereum/sha3 (security/safe-unmask-data @entered-password))
-        config-map         (.stringify js/JSON (clj->js {:keyUID "" :keystorePath "" :password sha3-pwd}))]
+        key-uid            (get-in db [:multiaccount :key-uid])
+        config-map         (.stringify js/JSON (clj->js {:keyUID key-uid :keystorePath "" :password sha3-pwd}))]
     (status/get-connection-string-for-bootstrapping-another-device
      config-map
      #(>evt [:bottom-sheet/show-sheet

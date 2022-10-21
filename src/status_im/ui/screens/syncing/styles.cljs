@@ -23,7 +23,7 @@
 (def device-name
   {:font-size 15
    :font-weight :500
-   :color colors/black})
+   :color "#8661C1"})
 
 (def device-status
   {:font-size 13
