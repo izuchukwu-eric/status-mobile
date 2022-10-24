@@ -5,9 +5,9 @@
             [quo2.components.buttons.button :as button]
             [quo2.components.markdown.text :as text]
             [quo2.components.notifications.activity-logs :as activity-logs]
-            [quo2.components.tabs.tabs :as tabs]
             [quo2.components.tags.context-tags :as context-tags]
             [quo2.foundations.colors :as colors]
+            [quo2.components.tags.scrollable-view :as scrollable-view]
             [status-im.constants :as constants]
             [status-im.activity-center.notification-types :as types]
             [status-im.i18n.i18n :as i18n]
@@ -162,13 +162,14 @@
 (defn tabs
   []
   (let [filter-type (<sub [:activity-center/filter-type])]
-    [tabs/scrollable-tabs {:size                32
+    [scrollable-view/view {:size                32
                            :blur?               true
                            :override-theme      :dark
                            :style               {:padding-left 20}
                            :fade-end-percentage 0.79
                            :scroll-on-press?    true
                            :fade-end?           true
+                           :component           :tabs
                            :on-change           #(>evt [:activity-center.notifications/fetch-first-page {:filter-type %}])
                            :default-active      filter-type
                            :data                [{:id    types/no-type

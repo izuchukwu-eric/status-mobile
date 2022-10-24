@@ -41,6 +41,7 @@
             [status-im.ui2.screens.quo2-preview.tabs.segmented-tab :as segmented]
             [status-im.ui2.screens.quo2-preview.tabs.tabs :as tabs]
             [status-im.ui2.screens.quo2-preview.tags.context-tags :as context-tags]
+            [status-im.ui2.screens.quo2-preview.tags.tag :as tag]
             [status-im.ui2.screens.quo2-preview.tags.tags :as tags]
             [status-im.ui2.screens.quo2-preview.tags.permission-tag :as permission-tag]
             [status-im.ui2.screens.quo2-preview.tags.status-tags :as status-tags]
@@ -164,6 +165,9 @@
    :tags [{:name      :context-tags
            :insets    {:top false}
            :component context-tags/preview-context-tags}
+          {:name      :tag
+           :insets    {:top false}
+           :component tag/preview-tag}
           {:name      :tags
            :insets    {:top false}
            :component tags/preview-tags}

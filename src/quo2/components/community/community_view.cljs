@@ -8,7 +8,7 @@
    [quo2.components.community.style :as style]
    [react-native.core :as rn]))
 
-(defn community-stats [{:keys [icon members-count icon-color]}]
+(defn community-stats [{:keys [icon count icon-color]}]
   [rn/view (style/stats-count-container)
    [rn/view {:margin-right 4}
     [icons/icon icon {:container-style {:align-items     :center
@@ -18,7 +18,7 @@
                       :color           icon-color}]]
    [text/text {:weight :regular
                :size   :paragraph-1}
-    members-count]])
+    count]])
 
 (defn community-stats-column [type]
   (let [icon-color (colors/theme-colors colors/neutral-50 colors/neutral-40)]
@@ -26,14 +26,14 @@
                (style/card-stats-container)
                (style/list-stats-container))
      [community-stats {:icon       :main-icons2/group
-                       :members-count "629.2K" ;;TODO here should be formatted value, use money/format-members from outside this component
+                       :count      "629.2K" ;;TODO here should be formatted value, use money/format-members from outside this component
                        :icon-color icon-color}]
      [community-stats {:icon       :main-icons2/lightning
-                       :members-count "112.1K"
+                       :count      "112.1K"
                        :icon-color icon-color}]
      (when (= type :card-view)
        [community-stats {:icon       :main-icons2/placeholder
-                         :count      4
+                         :count      "4"
                          :icon-color icon-color}])]))
 
 (defn community-tags [tags]
@@ -42,12 +42,12 @@
      ^{:key id}
      [rn/view {:margin-right 8}
       [tag/tag
-       {:id       id
-        :size     24
-        :label    tag-label
-        :type     :emoji
-        :labelled true
-        :resource resource}]])])
+       {:id          id
+        :size        24
+        :label       tag-label
+        :type        :emoji
+        :labelled?   true
+        :resource    resource}]])])
 
 (defn community-title [{:keys [title description size] :or {size :small}}]
   [rn/view (style/community-title-description-container (if (= size :large) 56 32))

@@ -33,7 +33,8 @@
             quo2.components.notifications.notification-dot
             quo2.components.tags.tags
             quo2.components.tabs.tabs
-            quo2.components.tabs.account-selector))
+            quo2.components.tabs.account-selector
+            quo2.components.tags.scrollable-view :as scrollable-view))
 
 (def button quo2.components.buttons.button/button)
 (def dynamic-button quo2.components.buttons.dynamic-button/dynamic-button)
@@ -51,7 +52,7 @@
 (def reaction quo2.components.reactions.reaction/reaction)
 (def tags quo2.components.tags.tags/tags)
 (def tabs quo2.components.tabs.tabs/tabs)
-(def scrollable-tabs quo2.components.tabs.tabs/scrollable-tabs)
+(def scrollable-view quo2.components.tags.scrollable-view)
 (def account-selector quo2.components.tabs.account-selector/account-selector)
 
 ;;;; AVATAR
