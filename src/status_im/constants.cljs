@@ -21,12 +21,13 @@
 (def ^:const contact-request-state-received 3)
 (def ^:const contact-request-state-dismissed 4)
 
-(def ^:const contact-verification-state-unknown 0)
-(def ^:const contact-verification-state-pending 1)
-(def ^:const contact-verification-state-accepted 2)
-(def ^:const contact-verification-state-declined 3)
-(def ^:const contact-verification-state-cancelled 4)
-(def ^:const contact-verification-state-trusted 5)
+(def ^:const contact-verification-status-unknown 0)
+(def ^:const contact-verification-status-pending 1)
+(def ^:const contact-verification-status-accepted 2)
+(def ^:const contact-verification-status-declined 3)
+(def ^:const contact-verification-status-cancelled 4)
+(def ^:const contact-verification-status-trusted 5)
+(def ^:const contact-verification-status-untrustworthy 6)
 
 (def ^:const emoji-reaction-love 1)
 (def ^:const emoji-reaction-thumbs-up  2)
@@ -189,7 +190,7 @@
 (def ^:const activity-center-notification-type-mention 3)
 (def ^:const activity-center-notification-type-reply 4)
 (def ^:const activity-center-notification-type-contact-request 5)
-(def ^:const activity-center-notification-type-contact-verification 6)
+(def ^:const activity-center-notification-type-contact-verification 10)
 
 ;; TODO: Remove this constant once the old Notification Center code is removed.
 ;; Its value clashes with the new constant `activity-center-notification-type-contact-verification`

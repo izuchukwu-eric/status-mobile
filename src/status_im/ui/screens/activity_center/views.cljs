@@ -1,5 +1,7 @@
 (ns status-im.ui.screens.activity-center.views
-  (:require [quo.components.animated.pressable :as animation]
+  (:require [clojure.string :as str]
+            [quo.components.animated.pressable :as animation]
+            [quo.components.safe-area :as safe-area]
             [quo.react :as react]
             [quo.react-native :as rn]
             [quo2.components.buttons.button :as button]
@@ -8,16 +10,16 @@
             [quo2.components.tabs.tabs :as tabs]
             [quo2.components.tags.context-tags :as context-tags]
             [quo2.foundations.colors :as colors]
+            [reagent.core :as reagent]
             [status-im.constants :as constants]
             [status-im.i18n.i18n :as i18n]
             [status-im.multiaccounts.core :as multiaccounts]
             [status-im.utils.datetime :as datetime]
-            [status-im.utils.handlers :refer [<sub >evt]]
-            [quo.components.safe-area :as safe-area]))
+            [status-im.utils.handlers :refer [<sub >evt]]))
 
 ;;;; Misc
 
-(defn sender-name
+(defn contact-name
   [contact]
   (or (get-in contact [:names :nickname])
       (get-in contact [:names :three-words-name])))
@@ -52,7 +54,7 @@
                                  :size           :small
                                  :style          {:background-color colors/white-opa-10}
                                  :text-style     {:color colors/white}}
-                                (sender-name contact)
+                                (contact-name contact)
                                 (multiaccounts/displayed-photo contact)]
                                [rn/text {:style {:color colors/white}}
                                 (i18n/label :t/contact-request-sent)]]
@@ -68,53 +70,85 @@
                     {:button-1 {:label    (i18n/label :t/decline)
                                 :type     :danger
                                 :on-press #(>evt [:contact-requests.ui/decline-request id])}
-                     :button-2 {:label                     (i18n/label :t/message-reply)
-                                :type                      :success
-                                :override-background-color colors/success-60
-                                :on-press                  #(>evt [:contact-requests.ui/accept-request id])}}
+                     :button-2 {:label    (i18n/label :t/accept)
+                                :type     :positive
+                                :on-press #(>evt [:contact-requests.ui/accept-request id])}}
                     nil))])))
 
 ;;;; Contact verification notifications
 
 (defmethod notification-component constants/activity-center-notification-type-contact-verification
-  [{:keys [id contact-verification-status] :as notification}]
-  (let [message (or (:message notification) (:last-notification notification))
-        contact (<sub [:contacts/contact-by-identity (:author notification)])]
-    [activity-logs/activity-log
-     (merge {:title     (i18n/label :t/identity-verification-request)
-             :icon      :main-icons2/friend
-             :timestamp (datetime/timestamp->relative (:timestamp notification))
-             :unread?   (not (:read notification))
-             :context   [[context-tags/user-avatar-tag
-                          {:color          :purple
-                           :override-theme :dark
-                           :size           :small
-                           :style          {:background-color colors/white-opa-10}
-                           :text-style     {:color colors/white}}
-                          (sender-name contact)
-                          (multiaccounts/displayed-photo contact)]
-                         [rn/text {:style {:color colors/white}}
-                          (str (i18n/label :t/identity-verification-request-sent)
-                               ":")]]
-             :message   (case contact-verification-status
-                          (constants/contact-verification-state-pending
-                           constants/contact-verification-state-declined)
-                          {:body (get-in message [:content :text])}
-                          nil)
-             :status    (case contact-verification-status
-                          constants/contact-verification-state-declined
-                          {:type :negative :label (i18n/label :t/declined)}
-                          nil)}
-            (case contact-verification-status
-              constants/contact-verification-state-pending
-              {:button-1 {:label    (i18n/label :t/decline)
-                          :type     :danger
-                          :on-press #(>evt [:activity-center.contact-verification/decline id])}
-               :button-2 {:label    (i18n/label :t/accept)
-                          :type     :primary
-                          ;; TODO: The acceptance flow will be implemented in follow-up PRs.
-                          :on-press identity}}
-              nil))]))
+  [_]
+  (let [replying?   (reagent/atom false)
+        reply-input (reagent/atom "")]
+    (fn [{:keys [id contact-verification-status] :as notification}]
+      (let [message (or (:message notification) (:last-notification notification))
+            contact (<sub [:contacts/contact-by-identity (:author notification)])
+            sender? (:outgoing message)]
+        (when-not (and sender? (= contact-verification-status constants/contact-verification-status-declined))
+          [activity-logs/activity-log
+           (merge {:title       (i18n/label :t/identity-verification-request)
+                   :icon        :main-icons2/friend
+                   :timestamp   (datetime/timestamp->relative (:timestamp notification))
+                   :unread?     (not (:read notification))
+                   :replying?   @replying?
+                   :reply-input reply-input
+                   :context     [[context-tags/user-avatar-tag
+                                  {:color          :purple
+                                   :override-theme :dark
+                                   :size           :small
+                                   :style          {:background-color colors/white-opa-10}
+                                   :text-style     {:color colors/white}}
+                                  (contact-name contact)
+                                  (multiaccounts/displayed-photo contact)]
+                                 [rn/text {:style {:color colors/white}}
+                                  (if sender?
+                                    (cond (or (= contact-verification-status constants/contact-verification-status-accepted)
+                                              (= contact-verification-status constants/contact-verification-status-trusted)
+                                              (= contact-verification-status constants/contact-verification-status-untrustworthy))
+                                          (str (str/lower-case (i18n/label :t/replied)) ":"))
+                                    (cond (or (= contact-verification-status constants/contact-verification-status-accepted)
+                                              (= contact-verification-status constants/contact-verification-status-pending)
+                                              (= contact-verification-status constants/contact-verification-status-declined))
+                                          (str (i18n/label :t/identity-verification-request-sent) ":")))]]
+                   :message     (if sender?
+                                  (cond (or (= contact-verification-status constants/contact-verification-status-accepted)
+                                            (= contact-verification-status constants/contact-verification-status-trusted)
+                                            (= contact-verification-status constants/contact-verification-status-untrustworthy))
+                                        {:title (get-in message [:content :text])
+                                         :body  (get-in notification [:reply-message :content :text])})
+                                  (cond (or (= contact-verification-status constants/contact-verification-status-accepted)
+                                            (= contact-verification-status constants/contact-verification-status-pending)
+                                            (= contact-verification-status constants/contact-verification-status-declined))
+                                        {:body (get-in message [:content :text])}))
+                   :status      (if sender?
+                                  (cond (= contact-verification-status constants/contact-verification-status-trusted)
+                                        {:type :positive :label (i18n/label :t/status-confirmed)}
+                                        (= contact-verification-status constants/contact-verification-status-untrustworthy)
+                                        {:type :negative :label (i18n/label :t/untrustworthy)})
+                                  (cond (= contact-verification-status constants/contact-verification-status-accepted)
+                                        {:type :positive :label (i18n/label :t/replied)}
+                                        (= contact-verification-status constants/contact-verification-status-declined)
+                                        {:type :negative :label (i18n/label :t/declined)}))}
+                  (if sender?
+                    (cond (= contact-verification-status constants/contact-verification-status-accepted)
+                          {:button-1 {:label    (i18n/label :t/untrustworthy)
+                                      :type     :danger
+                                      :on-press #(>evt [:activity-center.contact-verification/mark-as-untrustworthy id])}
+                           :button-2 {:label    (i18n/label :t/accept)
+                                      :type     :positive
+                                      :on-press #(>evt [:activity-center.contact-verification/mark-as-trusted id])}})
+                    (cond (= contact-verification-status constants/contact-verification-status-pending)
+                          {:button-1 {:label    (i18n/label :t/decline)
+                                      :type     :danger
+                                      :on-press #(>evt [:activity-center.contact-verification/decline id])}
+                           :button-2 {:label    (if @replying?
+                                                  (i18n/label :t/send-reply)
+                                                  (i18n/label :t/message-reply))
+                                      :type     :primary
+                                      :on-press (if @replying?
+                                                  #(>evt [:activity-center.contact-verification/reply id @reply-input])
+                                                  #(reset! replying? true))}})))])))))
 
 ;;;; Type-independent components
 

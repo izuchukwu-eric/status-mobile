@@ -71,12 +71,82 @@
              :error                   error})
   nil)
 
+(fx/defn contact-verification-reply
+  {:events [:activity-center.contact-verification/reply]}
+  [_ contact-verification-id response]
+  {::json-rpc/call [{:method     "wakuext_acceptContactVerificationRequest"
+                     :params     [contact-verification-id response]
+                     :on-success #(rf/dispatch [:activity-center.contact-verification/reply-success %])
+                     :on-error   #(rf/dispatch [:activity-center.contact-verification/reply-error contact-verification-id %])}]})
+
+(fx/defn contact-verification-reply-success
+  {:events [:activity-center.contact-verification/reply-success]}
+  [cofx response]
+  (->> response
+       :activityCenterNotifications
+       (map data-store.activities/<-rpc)
+       (notifications-reconcile cofx)))
+
+(fx/defn contact-verification-reply-error
+  {:events [:activity-center.contact-verification/reply-error]}
+  [_ contact-verification-id error]
+  (log/warn "Failed to reply to contact verification"
+            {:contact-verification-id contact-verification-id
+             :error                   error})
+  nil)
+
+(fx/defn contact-verification-mark-as-trusted
+  {:events [:activity-center.contact-verification/mark-as-trusted]}
+  [_ notification-id]
+  {::json-rpc/call [{:method     "wakuext_verifiedTrusted"
+                     :params     [{:id notification-id}]
+                     :on-success #(rf/dispatch [:activity-center.contact-verification/mark-as-trusted-success %])
+                     :on-error   #(rf/dispatch [:activity-center.contact-verification/mark-as-trusted-error notification-id %])}]})
+
+(fx/defn contact-verification-mark-as-trusted-success
+  {:events [:activity-center.contact-verification/mark-as-trusted-success]}
+  [_ response]
+  (tap> {:response-trusted response})
+  nil)
+
+(fx/defn contact-verification-mark-as-trusted-error
+  {:events [:activity-center.contact-verification/mark-as-trusted-error]}
+  [_ notification-id error]
+  (log/warn "Failed to mark verified contact as trusted"
+            {:notification-id notification-id :error error})
+  nil)
+
+(fx/defn contact-verification-mark-as-untrustworthy
+  {:events [:activity-center.contact-verification/mark-as-untrustworthy]}
+  [_ notification-id]
+  {::json-rpc/call [{:method "wakuext_verifiedUntrustworthy"
+                     :params [{:id notification-id}]
+                     ;; The call response on success is nil.
+                     :on-success #(rf/dispatch [:activity-center.contact-verification/mark-as-untrustworthy-success %])
+                     :on-error #(rf/dispatch [:activity-center.contact-verification/mark-as-untrustworthy-error notification-id %])}]})
+
+(fx/defn contact-verification-mark-as-untrustworthy-success
+  {:events [:activity-center.contact-verification/mark-as-untrustworthy-success]}
+  [_ response]
+  (tap> {:untrustworthy-success response})
+  nil)
+
+(fx/defn contact-verification-mark-as-untrustworthy-error
+  {:events [:activity-center.contact-verification/mark-as-untrustworthy-error]}
+  [_ notification-id error]
+  (log/warn "Failed to mark verified contact as untrustworthy"
+            {:notification-id notification-id :error error})
+  nil)
+
 ;;;; Notifications fetching and pagination
 
 (def defaults
   {:filter-status          :unread
    :filter-type            const/activity-center-notification-type-no-type
-   :notifications-per-page 10})
+   ;; Choose the maximum number of notifications that *usually/safely* fit on
+   ;; most screens, so that the UI doesn't have to needlessly render
+   ;; notifications.
+   :notifications-per-page 8})
 
 (def start-or-end-cursor
   "")
