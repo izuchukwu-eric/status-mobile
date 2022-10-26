@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useDerivedValue, withTiming, withSequence, withDelay, Easing } from 'react-native-reanimated';
-=======
-import { useDerivedValue, interpolate } from 'react-native-reanimated';
->>>>>>> 08f5216de (attempt to fix rings re-render problem, no success so far)
+import { useDerivedValue, withTiming, withSequence, withDelay, Easing, interpolate } from 'react-native-reanimated';
 
 // Generic Worklets
 
@@ -133,20 +129,28 @@ export function homeStackScale (homeStackOpen, minimizeScale) {
   );
 }
 
-export function audioRecorderRingScale (scale, multiplier) {
-  return useDerivedValue(
-    function () {
-      'worklet'
-      return scale.value * multiplier;
-    }
-  );
-}
-
 export function interpolateValue(sharedValue, inputRange, outputRange) {
   return useDerivedValue(
     function () {
       'worklet'
       return interpolate(sharedValue.value, inputRange, outputRange);
+    }
+  );
+}
+
+const MAX_SCALE = 1.8;
+
+export function ringScale(scale, substract) {
+  return useDerivedValue(
+    function () {
+      'worklet'
+      const value = scale.value;
+      const maxDelta = MAX_SCALE - 1;
+      const maxDeltaDiff = 1 - maxDelta;
+      const maxVirtualScale = MAX_SCALE + maxDelta;
+      const decimals = value - Math.floor(value);
+      const normalizedValue = value >= maxVirtualScale ? (decimals + ((parseInt(value) - 1) * maxDeltaDiff) + 1) : value;
+      return (((normalizedValue - substract) > MAX_SCALE ? normalizedValue - maxDelta : normalizedValue) - substract);
     }
   );
 }

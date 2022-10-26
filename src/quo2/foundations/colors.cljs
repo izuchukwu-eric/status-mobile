@@ -1,5 +1,5 @@
 (ns quo2.foundations.colors
-  (:require [clojure.string :as string]
+  (:require [clojure.string :as string :refer [index-of split]]
             [quo2.theme :as theme]))
 
 (defn alpha [value opacity]
@@ -12,6 +12,20 @@
         (str "rgba(" r "," g "," b "," opacity ")"))
       (let [rgb (string/split value #",")]
         (str (string/join "," (butlast rgb)) "," opacity ")")))))
+
+(defn alpha-opaque [value opacity]
+  (when value
+    (if (string/starts-with? value "#")
+      (let [hex (string/replace value #"#" "")
+            r   (- 255 (* opacity (- 255 (js/parseInt (subs hex 0 2) 16))))
+            g   (- 255 (* opacity (- 255 (js/parseInt (subs hex 2 4) 16))))
+            b   (- 255 (* opacity (- 255 (js/parseInt (subs hex 4 6) 16))))]
+        (str "rgb(" r "," g "," b ")"))
+      (let [rgb (string/split value #",")
+            r   (- 255 (* opacity (- 255 (get rgb 0))))
+            g   (- 255 (* opacity (- 255 (get rgb 1))))
+            b   (- 255 (* opacity (- 255 (get rgb 2))))]
+        (str "rgb(" r "," g "," b ")")))))
 
 (def theme-alpha
   (memoize
@@ -73,6 +87,9 @@
 (def neutral-100-opa-80 (alpha neutral-100 0.8))
 (def neutral-100-opa-90 (alpha neutral-100 0.9))
 (def neutral-100-opa-95 (alpha neutral-100 0.95))
+
+;;80 with transparency opaque
+(def neutral-80-opa-5-opaque (alpha-opaque neutral-80 0.05))
 
 ;;;;White
 

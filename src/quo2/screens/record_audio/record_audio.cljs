@@ -13,10 +13,10 @@
       [rn/view {:padding-bottom 150}
        [preview/customizer state descriptor]
        [rn/view {:padding-vertical 60
-                 :align-items      :center}
+                 :align-items      :center
+                 :background-color :transparent}
         [record-audio/input-view]]])))
 
 (defn preview-record-audio []
-  [rn/view {:background-color (colors/theme-colors colors/white colors/neutral-90)
-            :flex             1}
+  [rn/view {:flex             1}
    [cool-preview]])

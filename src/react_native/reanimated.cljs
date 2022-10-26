@@ -3,9 +3,7 @@
             [reagent.core :as reagent]
             [clojure.string :as string]
             ["react-native-reanimated" :default reanimated
-             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat withSequence Easing Keyframe cancelAnimation)])
-  (:require-macros [quo.react :refer [with-deps-check
-                                      maybe-js-deps]]))
+             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat withSequence Easing Keyframe cancelAnimation)]))
 
 ;; Animated Components
 (def create-animated-component (comp reagent/adapt-react-class (.-createAnimatedComponent reanimated)))
@@ -61,9 +59,7 @@
 ;; Worklets
 (def worklet-factory (js/require "../src/js/worklet_factory.js"))
 
-;; Interpolate
-
-(defn use-interpolate [shared-value input-range output-range]
+(defn interpolate [shared-value input-range output-range]
   (.interpolateValue ^js worklet-factory
                      shared-value
                      (clj->js input-range)
@@ -91,10 +87,9 @@
   (set-shared-value anim (with-delay delay (with-timing val (js-obj "duration" duration
                                                                     "easing"   (get easings easing))))))
 
-(defn animate-shared-value-with-delay-repeat [anim val duration easing delay repeat-times]
+(defn animate-shared-value-with-delay-repeat
+  ([anim val duration easing delay repeat-times]
+   (animate-shared-value-with-delay-repeat anim val duration easing delay repeat-times false))
+  ([anim val duration easing delay repeat-times reverse?]
   (set-shared-value anim (with-delay delay (with-repeat (with-timing val (js-obj "duration" duration
-                                                                                 "easing"   (get easings easing))) repeat-times false))))
-
-(defn animate-shared-value-repeat [anim val duration easing repeat-times]
-  (set-shared-value anim (with-repeat (with-timing val (js-obj "duration" duration
-                                                               "easing"   (get easings easing))) repeat-times false)))
+                                                                                 "easing"   (get easings easing))) repeat-times reverse?)))))
