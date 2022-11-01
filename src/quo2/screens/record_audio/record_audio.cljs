@@ -1,22 +1,14 @@
 (ns quo2.screens.record-audio.record-audio
-  (:require [quo.previews.preview :as preview]
-            [quo.react-native :as rn]
-            [quo2.components.record-audio.record-audio :as record-audio]
-            [quo2.foundations.colors :as colors]
-            [reagent.core :as reagent]))
-
-(def descriptor [])
+  (:require [quo.react-native :as rn]
+            [quo2.components.record-audio.record-audio :as record-audio]))
 
 (defn cool-preview []
-  (let [state (reagent/atom {})]
-    (fn []
-      [rn/view {:padding-bottom 150}
-       [preview/customizer state descriptor]
-       [rn/view {:padding-vertical 60
-                 :align-items      :center
-                 :background-color :transparent}
-        [record-audio/input-view]]])))
+  [rn/view {:padding-bottom 150}
+   [rn/view {:padding-vertical 60
+             :align-items      :center
+             :background-color :transparent}
+    [record-audio/input-view]]])
 
 (defn preview-record-audio []
-  [rn/view {:flex             1}
+  [rn/view {:flex 1}
    [cool-preview]])

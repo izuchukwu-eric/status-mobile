@@ -1,27 +1,27 @@
 (ns quo2.foundations.colors
-  (:require [clojure.string :as string :refer [index-of split]]
-            [quo2.theme :as theme]))
+  (:require [clojure.string :as string :refer [join replace split starts-with?]]
+            [quo.theme :as theme]))
 
 (defn alpha [value opacity]
   (when value
-    (if (string/starts-with? value "#")
-      (let [hex (string/replace value #"#" "")
+    (if (starts-with? value "#")
+      (let [hex (replace value #"#" "")
             r   (js/parseInt (subs hex 0 2) 16)
             g   (js/parseInt (subs hex 2 4) 16)
             b   (js/parseInt (subs hex 4 6) 16)]
         (str "rgba(" r "," g "," b "," opacity ")"))
       (let [rgb (string/split value #",")]
-        (str (string/join "," (butlast rgb)) "," opacity ")")))))
+        (str (join "," (butlast rgb)) "," opacity ")")))))
 
 (defn alpha-opaque [value opacity]
   (when value
-    (if (string/starts-with? value "#")
-      (let [hex (string/replace value #"#" "")
+    (if (starts-with? value "#")
+      (let [hex (replace value #"#" "")
             r   (- 255 (* opacity (- 255 (js/parseInt (subs hex 0 2) 16))))
             g   (- 255 (* opacity (- 255 (js/parseInt (subs hex 2 4) 16))))
             b   (- 255 (* opacity (- 255 (js/parseInt (subs hex 4 6) 16))))]
         (str "rgb(" r "," g "," b ")"))
-      (let [rgb (string/split value #",")
+      (let [rgb (split value #",")
             r   (- 255 (* opacity (- 255 (get rgb 0))))
             g   (- 255 (* opacity (- 255 (get rgb 1))))
             b   (- 255 (* opacity (- 255 (get rgb 2))))]

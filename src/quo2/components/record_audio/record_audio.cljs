@@ -18,49 +18,25 @@
                                  :pressed  colors/primary-50
                                  :disabled colors/primary-60}}})
 
+(def recording? (reagent/atom false))
+(def locked? (reagent/atom false))
+(def ready-to-send? (reagent/atom false))
+(def ready-to-lock? (reagent/atom false))
+(def ready-to-delete? (reagent/atom false))
+(def clear-timeout (atom nil))
+
+(def scale-to-each 1.8)
+(def scale-to-total 2.6)
+(def scale-padding 0.16)
+(def opacity-from-lock 1)
+(def opacity-from-default 0.5)
+(def signal-anim-duration 3900)
+(def signal-anim-duration-2 1950)
+
 (defn ring-scale [scale substract]
   (.ringScale ^js reanimated/worklet-factory
               scale
               substract))
-
-(def delete-button-frame (reagent/atom nil))
-
-(def lock-button-frame (reagent/atom nil))
-
-(def send-button-frame (reagent/atom nil))
-
-(def record-button-frame (reagent/atom nil))
-
-(def recording? (reagent/atom false))
-
-(def locked? (reagent/atom false))
-
-(def ready-to-send? (reagent/atom false))
-
-(def ready-to-lock? (reagent/atom false))
-
-(def ready-to-delete? (reagent/atom false))
-
-(def clear-timeout (atom nil))
-
-(def scale-to-each 1.8)
-
-(def scale-to-total 2.6)
-
-(def scale-padding 0.16)
-
-(def opacity-from-lock 1)
-
-(def opacity-from-default 0.5)
-
-(def signal-anim-duration 3900)
-
-(def signal-anim-duration-2 1950)
-
-(def memo-as-element
-  (memoize
-   (fn [element]
-     (reagent/as-element element))))
 
 (defn record-button [scale]
   [:f>
@@ -159,45 +135,42 @@
            gray-overlay-opacity (reanimated/use-shared-value 0)
            start-animation (fn []
                              (reanimated/animate-shared-value-with-timing scale 2.6 signal-anim-duration :linear)
-                             (reset! clear-timeout (js/setTimeout #(do (println "restart in loop")
-                                                                       (reanimated/set-shared-value scale scale-to-each)
+                             ;; TODO: Research if we can implement this with withSequence method from Reanimated 2
+                             (reset! clear-timeout (js/setTimeout #(do (reanimated/set-shared-value scale scale-to-each)
                                                                        (reanimated/animate-shared-value-with-delay-repeat scale scale-to-total signal-anim-duration-2 :linear 0 -1))
                                                                   signal-anim-duration)))
-           stop-animation (fn []
-                            (reanimated/cancel-animation scale)
-                            (reanimated/set-shared-value scale 1)
-                            (when @clear-timeout (js/clearTimeout @clear-timeout)))
-           start-y-animation (fn []
-                               (reanimated/animate-shared-value-with-timing translate-y -64 1500 :easing1)
-                               (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700))
-           reset-y-animation (fn []
-                               (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
-                               (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear))
-           start-x-animation (memoize
-                              (fn []
+           stop-animation #(do
+                             (reanimated/cancel-animation scale)
+                             (reanimated/set-shared-value scale 1)
+                             (when @clear-timeout (js/clearTimeout @clear-timeout)))
+           start-y-animation #(do
+                                (reanimated/animate-shared-value-with-timing translate-y -64 1500 :easing1)
+                                (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700))
+           reset-y-animation #(do
+                                (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
+                                (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear))
+           start-x-animation #(do
                                 (reanimated/animate-shared-value-with-timing translate-x -64 1500 :easing1)
                                 (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700)
-                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 200 :linear)))
-           reset-x-animation (memoize
-                              (fn []
+                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 200 :linear))
+           reset-x-animation #(do
                                 (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
                                 (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
-                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 0 100 :linear)))
-           start-x-y-animation (fn []
-                                 (reanimated/animate-shared-value-with-timing translate-y -44 1200 :easing1)
-                                 (reanimated/animate-shared-value-with-timing translate-x -44 1200 :easing1)
-                                 (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
-                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 200 :linear))
-           reset-x-y-animation (fn []
-                                 (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
-                                 (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
-                                 (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
-                                 (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear))]
+                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 0 100 :linear))
+           start-x-y-animation #(do
+                                  (reanimated/animate-shared-value-with-timing translate-y -44 1200 :easing1)
+                                  (reanimated/animate-shared-value-with-timing translate-x -44 1200 :easing1)
+                                  (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
+                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 200 :linear))
+           reset-x-y-animation #(do
+                                  (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
+                                  (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
+                                  (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
+                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear))]
        (quo.react/effect! #(if @recording? (start-animation) (when-not @ready-to-lock? (stop-animation))) [@recording?])
        (quo.react/effect! #(if @ready-to-lock? (start-x-y-animation) (reset-x-y-animation)) [@ready-to-lock?])
        (quo.react/effect! #(if @ready-to-send? (start-y-animation) (reset-y-animation)) [@ready-to-send?])
        (quo.react/effect! #(if @ready-to-delete? (start-x-animation) (reset-x-animation)) [@ready-to-delete?])
-       (memo-as-element
        [reanimated/view {:style (reanimated/apply-animations-to-style
                                  {:transform [{:translateY translate-y}
                                               {:translateX translate-x}]}
@@ -209,46 +182,43 @@
                                   :align-items     :center
                                   :justify-content :center
                                   :z-index         0})
-                          :pointer-events :none
-                          :on-layout (fn [^js e]
-                                       (reset! record-button-frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
-         (memo-as-element
-          [:<>
-           [reanimated/view {:style ring-style-1}]
-           [reanimated/view {:style ring-style-2}]
-           [reanimated/view {:style ring-style-3}]
-           [reanimated/view {:style ring-style-4}]
-           [reanimated/view {:style ring-style-5}]])
-         [rn/view {:style {:width            56
-                           :height           56
-                           :border-radius    28
-                           :justify-content  :center
-                           :align-items      :center
-                           :background-color button-color
-                           :overflow         :hidden}}
-          [reanimated/view {:style (reanimated/apply-animations-to-style
-                                    {:opacity red-overlay-opacity}
-                                    {:position :absolute
-                                     :top              0
-                                     :left             0
-                                     :right            0
-                                     :bottom           0
-                                     :background-color colors/danger-50})}]
-          [reanimated/view {:style (reanimated/apply-animations-to-style
-                                    {:opacity gray-overlay-opacity}
-                                    {:position         :absolute
-                                     :top              0
-                                     :left             0
-                                     :right            0
-                                     :bottom           0
-                                     :background-color colors/neutral-80-opa-5-opaque})}]
-          [reanimated/view {:style (reanimated/apply-animations-to-style {:opacity icon-opacity} {})}
-           (if @locked?
-             [rn/view {:style {:width            13
-                               :height           13
-                               :border-radius    4
-                               :background-color colors/white}}]
-             [icons/icon :main-icons2/audio {:color icon-color}])]]])))])
+                         :pointer-events :none}
+        [:<>
+         [reanimated/view {:style ring-style-1}]
+         [reanimated/view {:style ring-style-2}]
+         [reanimated/view {:style ring-style-3}]
+         [reanimated/view {:style ring-style-4}]
+         [reanimated/view {:style ring-style-5}]]
+        [rn/view {:style {:width            56
+                          :height           56
+                          :border-radius    28
+                          :justify-content  :center
+                          :align-items      :center
+                          :background-color button-color
+                          :overflow         :hidden}}
+         [reanimated/view {:style (reanimated/apply-animations-to-style
+                                   {:opacity red-overlay-opacity}
+                                   {:position :absolute
+                                    :top              0
+                                    :left             0
+                                    :right            0
+                                    :bottom           0
+                                    :background-color colors/danger-50})}]
+         [reanimated/view {:style (reanimated/apply-animations-to-style
+                                   {:opacity gray-overlay-opacity}
+                                   {:position         :absolute
+                                    :top              0
+                                    :left             0
+                                    :right            0
+                                    :bottom           0
+                                    :background-color colors/neutral-80-opa-5-opaque})}]
+         [reanimated/view {:style (reanimated/apply-animations-to-style {:opacity icon-opacity} {})}
+          (if @locked?
+            [rn/view {:style {:width            13
+                              :height           13
+                              :border-radius    4
+                              :background-color colors/white}}]
+            [icons/icon :main-icons2/audio {:color icon-color}])]]]))])
 
 (defn send-button []
   [:f>
@@ -307,9 +277,7 @@
                                    :top              0
                                    :right            32
                                    :z-index          10})
-                          :pointer-events :none
-                          ::on-layout (fn [^js e]
-                                        (reset! send-button-frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
+                          :pointer-events :none}
          [icons/icon :main-icons2/arrow-up {:color           colors/white
                                             :size            20
                                             :container-style {:z-index 10}}]]]))])
@@ -388,9 +356,7 @@
                                    :left             24
                                    :overflow         :hidden
                                    :z-index          12})
-                          :pointer-events :none
-                          :on-layout (fn [^js e]
-                                       (reset! lock-button-frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
+                          :pointer-events :none}
          [icons/icon :main-icons2/unlocked {:color           colors/black
                                             :size            20}]]]))])
 
@@ -451,11 +417,33 @@
                                    :top              76
                                    :left             0
                                    :z-index          11})
-                          :pointer-events :none
-                          :on-layout (fn [^js e]
-                                       (reset! delete-button-frame (js->clj (-> e .-nativeEvent.layout) :keywordize-keys true)))}
+                          :pointer-events :none}
          [icons/icon :main-icons2/delete-context {:color colors/white
                                                   :size  20}]]]))])
+
+(def record-button-area
+  {:width  56
+   :height 56
+   :x      76
+   :y      76})
+
+(defn delete-button-area [active?]
+  {:width  (if active? 56 32)
+   :height (if active? 56 32)
+   :x      0
+   :y      (if active? 64 76)})
+
+(defn lock-button-area [active?]
+  {:width  (if active? 56 32)
+   :height (if active? 56 32)
+   :x      24
+   :y      24})
+
+(defn send-button-area [active?]
+  {:width  (if active? 56 32)
+   :height (if active? 56 32)
+   :x      (if active? 64 76)
+   :y      0})
 
 (defn touch-inside-layout? [{:keys [locationX locationY]} {:keys [width height x y]}]
   (let [max-x (+ x width)
@@ -481,30 +469,30 @@
                                                     (let [pressed-record-button? (touch-inside-layout?
                                                                                   {:locationX (-> e .-nativeEvent.locationX)
                                                                                    :locationY (-> e .-nativeEvent.locationY)}
-                                                                                  @record-button-frame)]
+                                                                                  record-button-area)]
                                                       (reset! recording? pressed-record-button?)
                                                       true))
                    :on-responder-move (fn [^js e]
                                         (let [moved-to-send-button? (touch-inside-layout?
                                                                      {:locationX (-> e .-nativeEvent.locationX)
                                                                       :locationY (-> e .-nativeEvent.locationY)}
-                                                                     @send-button-frame)
+                                                                     (send-button-area @ready-to-send?))
                                               moved-to-delete-button? (touch-inside-layout?
                                                                        {:locationX (-> e .-nativeEvent.locationX)
                                                                         :locationY (-> e .-nativeEvent.locationY)}
-                                                                       @delete-button-frame)
+                                                                       (delete-button-area @ready-to-delete?))
                                               moved-to-lock-button? (touch-inside-layout?
                                                                      {:locationX (-> e .-nativeEvent.locationX)
                                                                       :locationY (-> e .-nativeEvent.locationY)}
-                                                                     @lock-button-frame)]
-                                          (when-not (= @ready-to-delete? moved-to-delete-button?) (reset! ready-to-delete? moved-to-delete-button?))
-                                          (when-not (= @ready-to-send? moved-to-send-button?) (reset! ready-to-send? moved-to-send-button?))
-                                          (when-not (= @ready-to-lock? moved-to-lock-button?) (reset! ready-to-lock? moved-to-lock-button?))))
+                                                                     (lock-button-area @ready-to-lock?))]
+                                          (when (and (not= @ready-to-delete? moved-to-delete-button?) @recording?) (reset! ready-to-delete? moved-to-delete-button?))
+                                          (when (and (not= @ready-to-send? moved-to-send-button?) @recording?) (reset! ready-to-send? moved-to-send-button?))
+                                          (when (and (not= @ready-to-lock? moved-to-lock-button?) @recording?) (reset! ready-to-lock? moved-to-lock-button?))))
                    :on-responder-release (fn [^js e]
                                            (let [on-record-button? (touch-inside-layout?
                                                                     {:locationX (-> e .-nativeEvent.locationX)
                                                                      :locationY (-> e .-nativeEvent.locationY)}
-                                                                    @record-button-frame)]
+                                                                    (lock-button-area @ready-to-lock?))]
                                              (cond
                                                @ready-to-lock? (do
                                                                  (reset! locked? true)
@@ -519,7 +507,7 @@
                                                          (reset! ready-to-send? false)
                                                          (reset! ready-to-delete? false)
                                                          (reset! ready-to-lock? false)))))}
-        [delete-button]
-        [lock-button]
-        [send-button]
-        [record-button scale]])))])
+          [delete-button]
+          [lock-button]
+          [send-button]
+          [record-button scale]])))])

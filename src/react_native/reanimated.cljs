@@ -91,5 +91,5 @@
   ([anim val duration easing delay repeat-times]
    (animate-shared-value-with-delay-repeat anim val duration easing delay repeat-times false))
   ([anim val duration easing delay repeat-times reverse?]
-  (set-shared-value anim (with-delay delay (with-repeat (with-timing val (js-obj "duration" duration
-                                                                                 "easing"   (get easings easing))) repeat-times reverse?)))))
+   (set-shared-value anim (with-delay delay (with-repeat (with-timing val (js-obj "duration" duration
+                                                                                  "easing"   (get easings easing))) repeat-times reverse?)))))
