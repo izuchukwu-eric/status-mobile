@@ -4,7 +4,8 @@
             [quo2.foundations.colors :as colors]
             [quo2.components.icon :as icons]
             [react-native.reanimated :as reanimated]
-            [reagent.core :as reagent]))
+            [reagent.core :as reagent]
+            [cljs-bean.core :as bean]))
 
 (def themes
   {:light {:icon-color           colors/white
@@ -38,94 +39,42 @@
               scale
               substract))
 
+(defn signal-circle-apply-animations [scale opacity color]
+  (reanimated/apply-animations-to-style
+   {:transform [{:scale scale}]
+    :opacity   opacity}
+   {:width           56
+    :height          56
+    :border-width    1
+    :border-color    color
+    :border-radius   28
+    :position        :absolute
+    :justify-content :center
+    :align-items     :center
+    :z-index         0}))
+
+(def animated-ring
+  (reagent/adapt-react-class
+   (react/memo
+    (fn [props]
+      (let [{:keys [scale opacity color]} (bean/bean props)]
+        (reagent/as-element
+         [reanimated/view {:style (signal-circle-apply-animations scale opacity color)}]))))))
+
 (defn record-button [scale]
   [:f>
    (fn []
      (let [opacity-from (if @ready-to-lock? opacity-from-lock opacity-from-default)
-           scale-1 (ring-scale scale 0)
-           opacity-1 (reanimated/interpolate scale-1 [1 scale-to-each] [opacity-from 0])
-           scale-2 (ring-scale scale scale-padding)
-           opacity-2 (reanimated/interpolate scale-2 [1 scale-to-each] [opacity-from 0])
-           scale-3 (ring-scale scale (* scale-padding 2))
-           opacity-3 (reanimated/interpolate scale-3 [1 scale-to-each] [opacity-from 0])
-           scale-4 (ring-scale scale (* scale-padding 3))
-           opacity-4 (reanimated/interpolate scale-4 [1 scale-to-each] [opacity-from 0])
-           scale-5 (ring-scale scale (* scale-padding 4))
-           opacity-5 (reanimated/interpolate scale-5 [1 scale-to-each] [opacity-from 0])
+           animations (map
+                       (fn [index]
+                         (let [ring-scale (ring-scale scale (* scale-padding index))]
+                           {:scale ring-scale
+                            :opacity (reanimated/interpolate ring-scale [1 scale-to-each] [opacity-from 0])}))
+                       (range 0 5))
            rings-color (cond
                          @ready-to-lock? (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)
                          @ready-to-delete? colors/danger-50
                          :else colors/primary-50)
-           ring-style-1 (reanimated/apply-animations-to-style
-                         {:transform [{:scale scale-1}]
-                          :opacity   opacity-1}
-                         {:width           56
-                          :height          56
-                          :border-width    1
-                          :border-color    rings-color
-                          :border-radius   28
-                          :position        :absolute
-                          :left            20
-                          :top             20
-                          :justify-content :center
-                          :align-items     :center
-                          :z-index         -1})
-           ring-style-2 (reanimated/apply-animations-to-style
-                         {:transform [{:scale scale-2}]
-                          :opacity   opacity-2}
-                         {:width           56
-                          :height          56
-                          :border-width    1
-                          :border-color    rings-color
-                          :border-radius   28
-                          :position        :absolute
-                          :left            20
-                          :top             20
-                          :justify-content :center
-                          :align-items     :center
-                          :z-index         -1})
-           ring-style-3 (reanimated/apply-animations-to-style
-                         {:transform [{:scale scale-3}]
-                          :opacity   opacity-3}
-                         {:width           56
-                          :height          56
-                          :border-width    1
-                          :border-color    rings-color
-                          :border-radius   28
-                          :position        :absolute
-                          :left            20
-                          :top             20
-                          :justify-content :center
-                          :align-items     :center
-                          :z-index         -1})
-           ring-style-4 (reanimated/apply-animations-to-style
-                         {:transform [{:scale scale-4}]
-                          :opacity   opacity-4}
-                         {:width           56
-                          :height          56
-                          :border-width    1
-                          :border-color    rings-color
-                          :border-radius   28
-                          :position        :absolute
-                          :left            20
-                          :top             20
-                          :justify-content :center
-                          :align-items     :center
-                          :z-index         -1})
-           ring-style-5 (reanimated/apply-animations-to-style
-                         {:transform [{:scale scale-5}]
-                          :opacity   opacity-5}
-                         {:width           56
-                          :height          56
-                          :border-width    1
-                          :border-color    rings-color
-                          :border-radius   28
-                          :position        :absolute
-                          :left            20
-                          :top             20
-                          :justify-content :center
-                          :align-items     :center
-                          :z-index         -1})
            translate-y (reanimated/use-shared-value 0)
            translate-x (reanimated/use-shared-value 0)
            button-color colors/primary-50
@@ -184,11 +133,12 @@
                                   :z-index         0})
                          :pointer-events :none}
         [:<>
-         [reanimated/view {:style ring-style-1}]
-         [reanimated/view {:style ring-style-2}]
-         [reanimated/view {:style ring-style-3}]
-         [reanimated/view {:style ring-style-4}]
-         [reanimated/view {:style ring-style-5}]]
+         (map
+          (fn [animation]
+            [animated-ring {:scale    (:scale animation)
+                            :opacity (:opacity animation)
+                            :color   rings-color}])
+          animations)]
         [rn/view {:style {:width            56
                           :height           56
                           :border-radius    28
@@ -424,7 +374,7 @@
 (def record-button-area
   {:width  56
    :height 56
-   :x      76
+   :x      64
    :y      76})
 
 (defn delete-button-area [active?]
