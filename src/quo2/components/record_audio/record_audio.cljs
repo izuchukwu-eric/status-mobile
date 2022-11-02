@@ -53,7 +53,7 @@
            scale-5 (ring-scale scale (* scale-padding 4))
            opacity-5 (reanimated/interpolate scale-5 [1 scale-to-each] [opacity-from 0])
            rings-color (cond
-                         @ready-to-lock? colors/neutral-80-opa-5-opaque
+                         @ready-to-lock? (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)
                          @ready-to-delete? colors/danger-50
                          :else colors/primary-50)
            ring-style-1 (reanimated/apply-animations-to-style
@@ -129,7 +129,7 @@
            translate-y (reanimated/use-shared-value 0)
            translate-x (reanimated/use-shared-value 0)
            button-color colors/primary-50
-           icon-color (if @ready-to-lock? colors/black colors/white)
+           icon-color (if (and (not (colors/dark?)) @ready-to-lock?) colors/black colors/white)
            icon-opacity (reanimated/use-shared-value 1)
            red-overlay-opacity (reanimated/use-shared-value 0)
            gray-overlay-opacity (reanimated/use-shared-value 0)
@@ -211,7 +211,7 @@
                                     :left             0
                                     :right            0
                                     :bottom           0
-                                    :background-color colors/neutral-80-opa-5-opaque})}]
+                                    :background-color (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)})}]
          [reanimated/view {:style (reanimated/apply-animations-to-style {:opacity icon-opacity} {})}
           (if @locked?
             [rn/view {:style {:width            13
@@ -338,7 +338,7 @@
                                    {:justify-content  :center
                                     :align-items      :center
                                     :align-self       :center
-                                    :background-color colors/neutral-80-opa-5-opaque
+                                    :background-color (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)
                                     :overflow         :hidden})}]]
         [reanimated/view {:style (reanimated/apply-animations-to-style
                                   {:transform   [{:translateX translate-x-y}
@@ -349,7 +349,7 @@
 
                                    :justify-content  :center
                                    :align-items      :center
-                                   :background-color colors/neutral-80-opa-5-opaque
+                                   :background-color (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)
                                    :border-radius    16
                                    :position         :absolute
                                    :top              24
@@ -357,8 +357,8 @@
                                    :overflow         :hidden
                                    :z-index          12})
                           :pointer-events :none}
-         [icons/icon :main-icons2/unlocked {:color           colors/black
-                                            :size            20}]]]))])
+         [icons/icon :main-icons2/unlocked {:color (colors/theme-colors colors/black colors/white)
+                                            :size  20}]]]))])
 
 (defn delete-button []
   [:f>
@@ -418,8 +418,8 @@
                                    :left             0
                                    :z-index          11})
                           :pointer-events :none}
-         [icons/icon :main-icons2/delete-context {:color colors/white
-                                                  :size  20}]]]))])
+         [icons/icon :main-icons2/delete {:color colors/white
+                                          :size  20}]]]))])
 
 (def record-button-area
   {:width  56
