@@ -1,7 +1,9 @@
 (ns status-im.navigation2
   (:require [status-im.utils.fx :as fx]
             [status-im.reloader :as reloader]
-            [status-im.utils.datetime :as datetime]))
+            [status-im.utils.datetime :as datetime]
+            [status-im.async-storage.core :as async-storage]
+            [status-im.utils.config :as config]))
 
 (def parent-stack (atom :home-stack))
 

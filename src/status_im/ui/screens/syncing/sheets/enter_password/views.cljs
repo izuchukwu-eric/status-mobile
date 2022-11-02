@@ -22,7 +22,7 @@
 (def connection-string  (atom ""))
 
 (defn qr-code-view-with-connection-string [connection-string]
-  (log/debug "connection-string ===> " connection-string)
+  (log/info "connection-string ===> " connection-string)
   (let [window-width       @(re-frame/subscribe [:dimensions/window-width])
         valid-cs?          (string/starts-with? connection-string "cs")]
     [:<>
@@ -58,7 +58,7 @@
     (status/input-connection-string-for-bootstrapping
      connection-string
      config-map
-     #(log/debug "this is response from initiate-local-pairing-with-connection-string " %))
+     #(log/info "this is response from initiate-local-pairing-with-connection-string " %))
     )
   )
 

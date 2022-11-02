@@ -71,6 +71,6 @@
     (status/input-connection-string-for-bootstrapping
      connection-string
      config-map
-     #(log/debug "this is response from initiate-local-pairing-with-connection-string " %))
+     #(log/info "this is response from initiate-local-pairing-with-connection-string " %))
     )
   )

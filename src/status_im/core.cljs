@@ -18,7 +18,8 @@
             [status-im.utils.logging.core :as utils.logs]
             [status-im.utils.platform :as platform]
             [status-im.utils.snoopy :as snoopy]
-            [status-im.utils.universal-links.core :as utils.universal-links]))
+            [status-im.utils.universal-links.core :as utils.universal-links]
+            [status-im.async-storage.core :as async-storage]))
 
 (set! interop/next-tick js/setTimeout)
 (set! batching/fake-raf #(js/setTimeout % 0))
@@ -43,7 +44,7 @@
   (async-storage/get-item :local-pairing-mode-enabled? #(reset! config/local-pairing-mode-enabled? %))
 
   ;;DEV
-  (snoopy/subscribe!)ß
+  (snoopy/subscribe!)
   (when (and js/goog.DEBUG platform/ios? DevSettings)
     ;;on Android this method doesn't work
     (when-let [nm (.-_nativeModule DevSettings)]

@@ -92,10 +92,19 @@
                         :icon                :main-icons/send
                         :title               "Export unencrypted"}])
       (when config/local-pairing-mode-enabled?
-        [quo/list-item {:theme               :accent
-                        :on-press            #(hide-sheet-and-dispatch [::qr-scanner/scan-code {:handler ::qr-scanner/on-scan-success}])
-                        :icon                :main-icons/key
-                        :title               "Scan Sync Code"}])]]))
+            [:<>
+              [quo/list-item {:theme               :accent
+                              :on-press            #(hide-sheet-and-dispatch [::qr-scanner/scan-code {:handler ::qr-scanner/on-scan-success}])
+                              :icon                :main-icons/key
+                              :title               "Scan Sync Code"}]
+              [quo/list-item {:theme               :accent
+                              :on-press            #(hide-sheet-and-dispatch [:navigate-to :multiaccounts])
+                              :icon                :main-icons/key
+                              :title               "Show Existing Keys"}]
+             ]
+            )
+
+      ]]))
 
 (def bottom-sheet
   {:content bottom-sheet-view})

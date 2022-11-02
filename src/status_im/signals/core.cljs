@@ -77,5 +77,5 @@
       "local-notifications" (local-notifications/process cofx (js->clj event-js :keywordize-keys true))
       "community.found" (link.preview/cache-community-preview-data (js->clj event-js :keywordize-keys true))
       "status.updates.timedout" (visibility-status-updates/handle-visibility-status-updates cofx (js->clj event-js :keywordize-keys true))
-      "localPairing" (log/debug "localpairing signal received ====> " event-str )
-      (log/debug "Event " type " not handled"))))
+      "localPairing" (log/info "localpairing signal received ====> " event-str )
+      (log/info "Event " type " not handled"))))

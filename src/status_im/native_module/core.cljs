@@ -242,13 +242,13 @@
 (defn get-connection-string-for-bootstrapping-another-device
   "used for generating connection string for local pairing"
   [configJSON callback]
-  (log/debug "[native-module] get-connection-string-for-bootstrapping-another-device using config "configJSON)
+  (log/info "[native-module] get-connection-string-for-bootstrapping-another-device using config "configJSON)
   (.getConnectionStringForBootstrappingAnotherDevice ^js (status) configJSON callback))
 
 (defn input-connection-string-for-bootstrapping
   "used for generating connection string for local pairing"
   [connectionString configJSON callback]
-  (log/debug "[native-module] input-connection-string-for-bootstrapping using connectionString "connectionString)
+  (log/info "[native-module] input-connection-string-for-bootstrapping using connectionString "connectionString)
   (.inputConnectionStringForBootstrapping ^js (status) connectionString configJSON callback))
 
 (defn hash-typed-data

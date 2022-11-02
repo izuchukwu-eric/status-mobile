@@ -107,7 +107,7 @@
     :wallet-connect (handle-wallet-connect cofx data)
     :localpairing   (handle-local-pairing cofx data)
      (do
-       (log/debug "type not found for " type)
+       (log/info "type not found for " type)
        {:dispatch [:navigate-back]
        :utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
                           :on-dismiss #(re-frame/dispatch [:pop-to-root-tab :chat-stack])}}
