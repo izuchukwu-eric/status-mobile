@@ -375,7 +375,7 @@
   {:width  56
    :height 56
    :x      64
-   :y      76})
+   :y      64})
 
 (defn delete-button-area [active?]
   {:width  (if active? 56 32)
