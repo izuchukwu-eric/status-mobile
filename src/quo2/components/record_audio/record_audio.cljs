@@ -268,8 +268,7 @@
        (quo.react/effect! #(if @ready-to-lock? (start-x-y-animation) (when-not @locked? (reset-x-y-animation))) [@ready-to-lock?])
        (quo.react/effect! #(if @locked? (fade-out-animation) (do (fade-in-animation) (reset-x-y-animation))) [@locked?])
        [:<>
-        [rn/view {:shouldRasterizeIOS true
-                  :style {:transform       [{:rotate "45deg"}]
+        [rn/view {:style {:transform       [{:rotate "45deg"}]
                           :justify-content :center
                           :align-items     :center
                           :position        :absolute
@@ -413,8 +412,7 @@
        (fn []
          [rn/view {:style {:width  140
                            :height 140}
-                   :renderToHardwareTextureAndroid true
-                   :shouldRasterizeIOS true
+                   :pointer-events :box-only
                    :on-start-should-set-responder (fn [^js e]
                                                     (let [pressed-record-button? (touch-inside-layout?
                                                                                   {:locationX (-> e .-nativeEvent.locationX)
