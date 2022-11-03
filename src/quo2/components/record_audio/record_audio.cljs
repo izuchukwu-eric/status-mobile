@@ -237,7 +237,7 @@
    (fn []
      (let [translate-x-y (reanimated/use-shared-value 0)
            opacity (reanimated/use-shared-value 1)
-           connector-opacity (reanimated/use-shared-value 1)
+           connector-opacity (reanimated/use-shared-value 0)
            width (reanimated/use-shared-value 24)
            height (reanimated/use-shared-value 12)
            border-radius (reanimated/use-shared-value 8)
@@ -377,22 +377,22 @@
    :y      64})
 
 (defn delete-button-area [active?]
-  {:width  (if active? 56 32)
+  {:width  (if active? 72 48)
    :height (if active? 56 32)
-   :x      0
+   :x      -16
    :y      (if active? 64 76)})
 
 (defn lock-button-area [active?]
-  {:width  (if active? 56 32)
-   :height (if active? 56 32)
-   :x      24
-   :y      24})
+  {:width  (if active? 72 48)
+   :height (if active? 72 48)
+   :x      8
+   :y      8})
 
 (defn send-button-area [active?]
   {:width  (if active? 56 32)
-   :height (if active? 56 32)
+   :height (if active? 72 48)
    :x      (if active? 64 76)
-   :y      0})
+   :y      -16})
 
 (defn touch-inside-layout? [{:keys [locationX locationY]} {:keys [width height x y]}]
   (let [max-x (+ x width)
@@ -433,6 +433,8 @@
                                                                      {:locationX (-> e .-nativeEvent.locationX)
                                                                       :locationY (-> e .-nativeEvent.locationY)}
                                                                      (lock-button-area @ready-to-lock?))]
+                                          (println {:locationX (-> e .-nativeEvent.locationX)
+                                                    :locationY (-> e .-nativeEvent.locationY)} "LCOALSA")
                                           (when (and (not= @ready-to-delete? moved-to-delete-button?) @recording?) (reset! ready-to-delete? moved-to-delete-button?))
                                           (when (and (not= @ready-to-send? moved-to-send-button?) @recording?) (reset! ready-to-send? moved-to-send-button?))
                                           (when (and (not= @ready-to-lock? moved-to-lock-button?) @recording?) (reset! ready-to-lock? moved-to-lock-button?))))
