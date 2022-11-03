@@ -25,6 +25,7 @@
 (def ready-to-lock? (reagent/atom false))
 (def ready-to-delete? (reagent/atom false))
 (def clear-timeout (atom nil))
+(def record-button-at-initial-position? (atom true))
 
 (def scale-to-each 1.8)
 (def scale-to-total 2.6)
@@ -93,20 +94,25 @@
                              (reanimated/set-shared-value scale 1)
                              (when @clear-timeout (js/clearTimeout @clear-timeout)))
            start-y-animation #(do
+                                (reset! record-button-at-initial-position? false)
                                 (reanimated/animate-shared-value-with-timing translate-y -64 1500 :easing1)
                                 (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700))
            reset-y-animation #(do
                                 (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
-                                (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear))
+                                (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
+                                (js/setTimeout (fn [] (reset! record-button-at-initial-position? true)) 500))
            start-x-animation #(do
+                                (reset! record-button-at-initial-position? false)
                                 (reanimated/animate-shared-value-with-timing translate-x -64 1500 :easing1)
                                 (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 700)
                                 (reanimated/animate-shared-value-with-timing red-overlay-opacity 1 200 :linear))
            reset-x-animation #(do
                                 (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
                                 (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
-                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 0 100 :linear))
+                                (reanimated/animate-shared-value-with-timing red-overlay-opacity 0 100 :linear)
+                                (js/setTimeout (fn [] (reset! record-button-at-initial-position? true)) 500))
            start-x-y-animation #(do
+                                  (reset! record-button-at-initial-position? false)
                                   (reanimated/animate-shared-value-with-timing translate-y -44 1200 :easing1)
                                   (reanimated/animate-shared-value-with-timing translate-x -44 1200 :easing1)
                                   (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
@@ -115,7 +121,8 @@
                                   (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
                                   (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
                                   (reanimated/animate-shared-value-with-timing icon-opacity 1 500 :linear)
-                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear))]
+                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 0 800 :linear)
+                                  (js/setTimeout (fn [] (reset! record-button-at-initial-position? true)) 800))]
        (quo.react/effect! #(if @recording? (start-animation) (when-not @ready-to-lock? (stop-animation))) [@recording?])
        (quo.react/effect! #(if @ready-to-lock? (start-x-y-animation) (reset-x-y-animation)) [@ready-to-lock?])
        (quo.react/effect! #(if @ready-to-send? (start-y-animation) (reset-y-animation)) [@ready-to-send?])
@@ -295,7 +302,6 @@
                                    :opacity      opacity}
                                   {:width            32
                                    :height           32
-
                                    :justify-content  :center
                                    :align-items      :center
                                    :background-color (colors/theme-colors colors/neutral-80-opa-5-opaque colors/neutral-80)
@@ -433,11 +439,22 @@
                                                                      {:locationX (-> e .-nativeEvent.locationX)
                                                                       :locationY (-> e .-nativeEvent.locationY)}
                                                                      (lock-button-area @ready-to-lock?))]
-                                          (println {:locationX (-> e .-nativeEvent.locationX)
-                                                    :locationY (-> e .-nativeEvent.locationY)} "LCOALSA")
-                                          (when (and (not= @ready-to-delete? moved-to-delete-button?) @recording?) (reset! ready-to-delete? moved-to-delete-button?))
-                                          (when (and (not= @ready-to-send? moved-to-send-button?) @recording?) (reset! ready-to-send? moved-to-send-button?))
-                                          (when (and (not= @ready-to-lock? moved-to-lock-button?) @recording?) (reset! ready-to-lock? moved-to-lock-button?))))
+                                          (cond
+                                            (and
+                                             (or
+                                              (and (not moved-to-lock-button?) @ready-to-lock?)
+                                              (and moved-to-lock-button? @record-button-at-initial-position?))
+                                             @recording?) (reset! ready-to-lock? moved-to-lock-button?)
+                                            (and
+                                             (or
+                                              (and (not moved-to-delete-button?) @ready-to-delete?)
+                                              (and moved-to-delete-button? @record-button-at-initial-position?))
+                                             @recording?) (reset! ready-to-delete? moved-to-delete-button?)
+                                            (and
+                                             (or
+                                              (and (not moved-to-send-button?) @ready-to-send?)
+                                              (and moved-to-send-button? @record-button-at-initial-position?))
+                                             @recording?) (reset! ready-to-send? moved-to-send-button?))))
                    :on-responder-release (fn [^js e]
                                            (let [on-record-button? (touch-inside-layout?
                                                                     {:locationX (-> e .-nativeEvent.locationX)
