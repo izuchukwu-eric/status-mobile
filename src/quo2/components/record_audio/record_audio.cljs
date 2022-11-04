@@ -26,6 +26,7 @@
 (def ready-to-delete? (reagent/atom false))
 (def clear-timeout (atom nil))
 (def record-button-at-initial-position? (atom true))
+(def record-button-is-animating? (atom false))
 
 (def scale-to-each 1.8)
 (def scale-to-total 2.6)
@@ -113,10 +114,12 @@
                                 (js/setTimeout (fn [] (reset! record-button-at-initial-position? true)) 500))
            start-x-y-animation #(do
                                   (reset! record-button-at-initial-position? false)
+                                  (reset! record-button-is-animating? true)
                                   (reanimated/animate-shared-value-with-timing translate-y -44 1200 :easing1)
                                   (reanimated/animate-shared-value-with-timing translate-x -44 1200 :easing1)
                                   (reanimated/animate-shared-value-with-delay icon-opacity 0 200 :linear 300)
-                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 200 :linear))
+                                  (reanimated/animate-shared-value-with-timing gray-overlay-opacity 1 200 :linear)
+                                  (js/setTimeout (fn [] (reset! record-button-is-animating? false)) 1200))
            reset-x-y-animation #(do
                                   (reanimated/animate-shared-value-with-timing translate-y 0 300 :easing1)
                                   (reanimated/animate-shared-value-with-timing translate-x 0 300 :easing1)
@@ -142,7 +145,7 @@
         [:<>
          (map
           (fn [animation]
-            [animated-ring {:scale    (:scale animation)
+            [animated-ring {:scale   (:scale animation)
                             :opacity (:opacity animation)
                             :color   rings-color}])
           animations)]
@@ -420,60 +423,65 @@
                            :height 140}
                    :pointer-events :box-only
                    :on-start-should-set-responder (fn [^js e]
-                                                    (let [pressed-record-button? (touch-inside-layout?
-                                                                                  {:locationX (-> e .-nativeEvent.locationX)
-                                                                                   :locationY (-> e .-nativeEvent.locationY)}
-                                                                                  record-button-area)]
-                                                      (reset! recording? pressed-record-button?)
-                                                      true))
+                                                    (when-not @locked?
+                                                      (let [pressed-record-button? (touch-inside-layout?
+                                                                                    {:locationX (-> e .-nativeEvent.locationX)
+                                                                                     :locationY (-> e .-nativeEvent.locationY)}
+                                                                                    record-button-area)]
+                                                        (reset! recording? pressed-record-button?)))
+                                                    true)
                    :on-responder-move (fn [^js e]
-                                        (let [moved-to-send-button? (touch-inside-layout?
-                                                                     {:locationX (-> e .-nativeEvent.locationX)
-                                                                      :locationY (-> e .-nativeEvent.locationY)}
-                                                                     (send-button-area @ready-to-send?))
-                                              moved-to-delete-button? (touch-inside-layout?
+                                        (when-not @locked?
+                                          (let [moved-to-send-button? (touch-inside-layout?
                                                                        {:locationX (-> e .-nativeEvent.locationX)
                                                                         :locationY (-> e .-nativeEvent.locationY)}
-                                                                       (delete-button-area @ready-to-delete?))
-                                              moved-to-lock-button? (touch-inside-layout?
-                                                                     {:locationX (-> e .-nativeEvent.locationX)
-                                                                      :locationY (-> e .-nativeEvent.locationY)}
-                                                                     (lock-button-area @ready-to-lock?))]
-                                          (cond
-                                            (and
-                                             (or
-                                              (and (not moved-to-lock-button?) @ready-to-lock?)
-                                              (and moved-to-lock-button? @record-button-at-initial-position?))
-                                             @recording?) (reset! ready-to-lock? moved-to-lock-button?)
-                                            (and
-                                             (or
-                                              (and (not moved-to-delete-button?) @ready-to-delete?)
-                                              (and moved-to-delete-button? @record-button-at-initial-position?))
-                                             @recording?) (reset! ready-to-delete? moved-to-delete-button?)
-                                            (and
-                                             (or
-                                              (and (not moved-to-send-button?) @ready-to-send?)
-                                              (and moved-to-send-button? @record-button-at-initial-position?))
-                                             @recording?) (reset! ready-to-send? moved-to-send-button?))))
+                                                                       (send-button-area @ready-to-send?))
+                                                moved-to-delete-button? (touch-inside-layout?
+                                                                         {:locationX (-> e .-nativeEvent.locationX)
+                                                                          :locationY (-> e .-nativeEvent.locationY)}
+                                                                         (delete-button-area @ready-to-delete?))
+                                                moved-to-lock-button? (touch-inside-layout?
+                                                                       {:locationX (-> e .-nativeEvent.locationX)
+                                                                        :locationY (-> e .-nativeEvent.locationY)}
+                                                                       (lock-button-area @ready-to-lock?))]
+                                            (cond
+                                              (and
+                                               (or
+                                                (and (not moved-to-lock-button?) @ready-to-lock?)
+                                                (and (not @locked?) moved-to-lock-button? @record-button-at-initial-position?))
+                                               @recording?) (reset! ready-to-lock? moved-to-lock-button?)
+                                              (and
+                                               (or
+                                                (and (not moved-to-delete-button?) @ready-to-delete?)
+                                                (and moved-to-delete-button? @record-button-at-initial-position?))
+                                               @recording?) (reset! ready-to-delete? moved-to-delete-button?)
+                                              (and
+                                               (or
+                                                (and (not moved-to-send-button?) @ready-to-send?)
+                                                (and moved-to-send-button? @record-button-at-initial-position?))
+                                               @recording?) (reset! ready-to-send? moved-to-send-button?)))))
                    :on-responder-release (fn [^js e]
                                            (let [on-record-button? (touch-inside-layout?
                                                                     {:locationX (-> e .-nativeEvent.locationX)
                                                                      :locationY (-> e .-nativeEvent.locationY)}
-                                                                    (lock-button-area @ready-to-lock?))]
+                                                                    record-button-area)]
                                              (cond
-                                               @ready-to-lock? (do
-                                                                 (reset! locked? true)
-                                                                 (reset! ready-to-lock? false))
-                                               on-record-button? (do
-                                                                   (when on-send (on-send))
-                                                                   (reset! locked? false)
-                                                                   (reset! recording? false)
-                                                                   (reset! ready-to-lock? false))
-                                               :else (do (reset! recording? false)
-                                                         (reset! locked? false)
-                                                         (reset! ready-to-send? false)
-                                                         (reset! ready-to-delete? false)
-                                                         (reset! ready-to-lock? false)))))}
+                                               (and @ready-to-lock? (not @record-button-is-animating?))
+                                               (do
+                                                 (reset! locked? true)
+                                                 (reset! ready-to-lock? false))
+                                               (and @locked? on-record-button?)
+                                               (do
+                                                 (when on-send (on-send))
+                                                 (reset! locked? false)
+                                                 (reset! recording? false)
+                                                 (reset! ready-to-lock? false))
+                                               (not @locked?)
+                                               (do
+                                                 (reset! recording? false)
+                                                 (reset! ready-to-send? false)
+                                                 (reset! ready-to-delete? false)
+                                                 (reset! ready-to-lock? false)))))}
           [delete-button]
           [lock-button]
           [send-button]
