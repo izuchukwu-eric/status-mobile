@@ -9,6 +9,7 @@
             [status-im.chat.models.link-preview :as link.preview]
             [status-im.visibility-status-updates.core :as visibility-status-updates]
             [status-im.utils.fx :as fx]
+            [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
 (fx/defn status-node-started
@@ -50,6 +51,17 @@
     {:db (assoc db :peer-stats peer-stats
                 :peers-count (count (:peers peer-stats)))}))
 
+(defn hide-sheet-and-dispatch [event]
+  (re-frame/dispatch [:bottom-sheet/hide])
+  (re-frame/dispatch event))
+
+(defn handle-local-pairing-signals [signal-type]
+  (log/info "localpairing signal received ====> " signal-type)
+  (if (= signal-type "process-success")
+    (log/info "inside process success workflow")
+    (hide-sheet-and-dispatch [:navigate-to :multiaccounts]))
+  )
+
 (fx/defn process
   {:events [:signals/signal-received]}
   [{:keys [db] :as cofx} event-str]
@@ -77,5 +89,5 @@
       "local-notifications" (local-notifications/process cofx (js->clj event-js :keywordize-keys true))
       "community.found" (link.preview/cache-community-preview-data (js->clj event-js :keywordize-keys true))
       "status.updates.timedout" (visibility-status-updates/handle-visibility-status-updates cofx (js->clj event-js :keywordize-keys true))
-      "localPairing" (log/info "localpairing signal received ====> " event-str )
+      "localPairing" (handle-local-pairing-signals event-str)
       (log/info "Event " type " not handled"))))
