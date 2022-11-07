@@ -3,7 +3,7 @@
             [reagent.core :as reagent]
             [clojure.string :as string]
             ["react-native-reanimated" :default reanimated
-             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat withSequence Easing Keyframe cancelAnimation)]))
+             :refer (useSharedValue useAnimatedStyle useDerivedValue useAnimatedReaction withTiming withDelay withSpring withRepeat Easing Keyframe cancelAnimation)]))
 
 ;; Animated Components
 (def create-animated-component (comp reagent/adapt-react-class (.-createAnimatedComponent reanimated)))
@@ -27,7 +27,6 @@
 (def with-delay withDelay)
 (def with-spring withSpring)
 (def with-repeat withRepeat)
-(def with-sequence withSequence)
 (def key-frame Keyframe)
 (def cancel-animation cancelAnimation)
 
@@ -74,9 +73,6 @@
         style      (apply dissoc (map-keys kebab-case->camelCase style) (keys animations))]
     (use-animated-style
      (.applyAnimationsToStyle ^js worklet-factory (clj->js animations) (clj->js style)))))
-
-(defn apply-memoized-animations-to-style [animations style]
-  (memoize (apply-animations-to-style animations style)))
 
 ;; Animators
 (defn animate-shared-value-with-timing [anim val duration easing]
