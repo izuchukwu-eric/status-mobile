@@ -75,15 +75,14 @@
 (defn options-menu []
   (let [community-mock (<sub [:get-screen-params :community-overview]) ;;TODO stop using mock data and only pass community id 
         community (<sub [:communities/community (:id community-mock)])]
-    [action-drawers/action-drawer {:actions (if (:joined community)
-                                              joined-options
-                                              not-joined-options)
-                                   :actions-with-consequence
+    [action-drawers/action-drawer [(if (:joined community)
+                                     joined-options
+                                     not-joined-options)
                                    (when (:joined community)
                                      [{:icon :main-icons2/log-out
                                        :label  (i18n/label :t/leave-community)
                                        :on-press #(>evt [:bottom-sheet/show-sheet
                                                          {:content (constantly [leave-sheet community])
-                                                          :content-height 300}])}])}]))
+                                                          :content-height 300}])}])]]))
 
 

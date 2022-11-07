@@ -3,7 +3,7 @@
             [reagent.core :as reagent]
             [status-im.react-native.resources :as resources]
             [status-im.ui.components.list.views :as list]
-            [status-im.ui.components.react :as react]
+            [quo.react-native :as rn]
             [quo2.components.markdown.text :as text]
             [quo2.components.buttons.button :as button]
             [quo2.components.selectors.disclaimer :as disclaimer]
@@ -34,14 +34,14 @@
                        :content "You will be asked to change your name or picture if the staff deems them inappropriate."}])
 
 (defn community-rule-item [{:keys [title content index]}]
-  [react/view
+  [rn/view
    {:style {:flex 1 :margin-top 16}}
-   [react/view
+   [rn/view
     {:style
      {:flex 1
       :flex-direction :row
       :align-items :center}}
-    [react/view
+    [rn/view
      {:style
       {:height 18
        :width 18
@@ -76,20 +76,22 @@
   [list/flat-list
    {:shows-horizontal-scroll-indicator false
     :data                              rules
-    :separator [react/view {:margin-top 1}]
+    :separator [rn/view {:margin-top 1}]
     :render-fn                         community-rule-item}])
 
 (defn request-to-join [community]
   (let [agreed-to-rules? (reagent/atom false)]
     (fn []
-      [react/view {:style {:flex 1 :margin-left 20 :margin-right 20 :margin-bottom 20}}
-       [react/view {:style {:flex 1 :flex-direction :row :align-items :center :justify-content :space-between}}
+      [rn/scroll-view {
+                       
+                :style { :margin-left 20 :margin-right 20 :margin-bottom 20}}
+       [rn/view {:style {:flex 1 :flex-direction :row :align-items :center :justify-content :space-between}}
 
         [text/text {:accessibility-label :communities-join-community
                     :weight              :semi-bold
                     :size                :heading-1}
-         (i18n/label :t/join-open-community)]
-        [react/view {:style {:height 32
+                  (i18n/label :t/join-open-community)]
+        [rn/view {:style {:height 32
                              :width 32
                              :align-items :center
                              :background-color colors/white
@@ -104,7 +106,8 @@
         {:style
          {:margin-right :auto
           :margin-top 8}}
-        (resources/get-image :status-logo) (:name community)]
+        (resources/get-image :status-logo) (:name community)
+        ]
        [text/text {:style {:margin-top 24}
                    :accessibility-label :communities-rules-title
                    :weight              :semi-bold
@@ -117,7 +120,7 @@
          :on-change #(swap! agreed-to-rules? not)}
         (i18n/label :t/accept-community-rules)]
 
-       [react/view {:style {:width "100%"
+       [rn/view {:style {:width "100%"
                             :margin-top 32 :margin-bottom 16
                             :flex 1
                             :flex-direction :row

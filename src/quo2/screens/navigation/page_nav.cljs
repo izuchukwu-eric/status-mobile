@@ -59,7 +59,7 @@
                                           :description            "SNT"
                                           :description-color      "black"
                                           :description-icon       :main-icons2/placeholder
-                                          :description-user-icon  "https://i.picsum.photos/id/810/200/300.jpg?hmac=HgwlXd-OaLOAqhGyCiZDUb_75EgUI4u0GtS7nfgxd8s"}
+                                          :description-user-icon  {:uri "https://i.picsum.photos/id/810/200/300.jpg?hmac=HgwlXd-OaLOAqhGyCiZDUb_75EgUI4u0GtS7nfgxd8s"}}
                             :left-section
                             {:icon                  :main-icons2/unlocked
                              :icon-background-color (if (colors/dark?)

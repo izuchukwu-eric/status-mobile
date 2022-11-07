@@ -42,7 +42,7 @@
     [icons/icon icon (icon-props icon-color :big)]]])
 
 (defn- mid-section-comp
-  [{:keys [description-user-icon horizontal-description? text-secondary-color align-mid? text-color icon main-text type description]}]
+  [{:keys [description-user-icon-source horizontal-description? text-secondary-color align-mid? text-color icon main-text type description description-user-icon-size]  :or {description-user-icon-size 32}}]
   [rn/view {:style (assoc
                     centrify-style
                     :flex-direction    :row
@@ -50,11 +50,11 @@
    (when (or (and (not horizontal-description?)
                   align-mid?
                   (not= :text-with-description type))
-             (and description-user-icon
+             (and description-user-icon-source
                   (not icon)))
-     [rn/image {:source {:uri description-user-icon}
-                :style  {:width         32
-                         :height        32
+     [rn/image {:source description-user-icon-source
+                :style  {:width         description-user-icon-size
+                         :height        description-user-icon-size
                          :border-radius 32
                          :margin-right  8}}])
    [rn/view {:style {:flex-direction (if horizontal-description?
@@ -163,7 +163,8 @@
       :description           string
       :description-color     color
       :description-icon      icon
-      :description-user-icon icon
+      :description-user-icon-source icon-source or {:uri icon-source}
+      :description-user-icon-size size
       :main-text-icon-color  color
      }
      :left-section 
@@ -219,7 +220,8 @@
                                    :description-color     (:description-color mid-section)
                                    :description-icon      (:description-icon mid-section)
                                    :align-mid?                        align-mid?
-                                   :description-user-icon (:description-user-icon mid-section))])]
+                                   :description-user-icon-size (:description-user-icon-size mid-section)
+                                   :description-user-icon-source (:description-user-icon-source mid-section))])]
      (when-not put-middle-section-on-left?
        [render-mid-section mid-section-props])
      (render-right-section right-section-buttons)]))
