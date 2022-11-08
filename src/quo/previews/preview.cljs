@@ -2,7 +2,8 @@
   (:require [reagent.core :as reagent]
             [quo.react-native :as rn]
             [quo.core :as quo]
-            [quo.design-system.colors :as colors])
+            [quo.design-system.colors :as colors]
+            [clojure.string :as string])
   (:require-macros quo.previews.preview))
 
 (def container {:flex-direction   :row
@@ -83,19 +84,24 @@
         "False"]]]]))
 
 (defn customizer-text
-  [{:keys [label key state]}]
+  [{:keys [label key state limit suffix]}]
   (let [state* (reagent/cursor state [key])]
     [rn/view {:style container}
      [label-view state label]
      [rn/view {:style {:flex 0.6}}
-      [quo/text-input {:value          @state*
-                       :show-cancel    false
-                       :style          {:border-radius 4
-                                        :border-width  1
-                                        :border-color  (:ui-02 @colors/theme)}
-                       :on-change-text #(do
-                                          (reset! state* %)
-                                          (reagent/flush))}]]]))
+      [quo/text-input (merge
+                       {:value          @state*
+                        :show-cancel    false
+                        :style          {:border-radius 4
+                                         :border-width  1
+                                         :border-color  (:ui-02 @colors/theme)}
+                        :on-change-text #(do
+                                           (reset! state* (if (and suffix (> (count %) (count @state*)))
+                                                            (str (string/replace % suffix "") suffix)
+                                                            %))
+                                           (reagent/flush))}
+                       (when limit
+                         {:max-length limit}))]]]))
 
 (defn value-for-key
   [id v]

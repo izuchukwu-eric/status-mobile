@@ -29,6 +29,7 @@
             [status-im.ui2.screens.quo2-preview.markdown.text :as text]
             [status-im.ui2.screens.quo2-preview.messages.gap :as messages-gap]
             [status-im.ui2.screens.quo2-preview.messages.system-message :as system-message]
+            [status-im.ui2.screens.quo2-preview.messages.author :as messages-author]
             [status-im.ui2.screens.quo2-preview.notifications.activity-logs :as activity-logs]
             [status-im.ui2.screens.quo2-preview.reactions.react :as react]
             [status-im.ui2.screens.quo2-preview.selectors.disclaimer :as disclaimer]
@@ -124,7 +125,10 @@
                :component messages-gap/preview-messages-gap}
               {:name      :system-messages
                :insets    {:top false}
-               :component system-message/preview-system-message}]
+               :component system-message/preview-system-message}
+              {:name      :author
+               :insets    {:top false}
+               :component messages-author/preview-author}]
    :navigation [{:name      :bottom-nav-tab
                  :insets    {:top false}
                  :component bottom-nav-tab/preview-bottom-nav-tab}

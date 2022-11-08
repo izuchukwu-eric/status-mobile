@@ -1,0 +1,61 @@
+(ns status-im.ui2.screens.quo2-preview.messages.author
+  (:require [quo.react-native :as rn]
+            [quo2.foundations.colors :as colors]
+            [quo.previews.preview :as preview]
+            [quo2.components.messages.author.view :as quo2]
+            [reagent.core :as reagent]))
+
+(def descriptor [{:label "Profile name"
+                  :key   :profile-name
+                  :type  :text
+                  :limit 24}
+                 {:label "Nickname"
+                  :key   :nickname
+                  :type  :text}
+                 {:label "Public key"
+                  :key   :public-key
+                  :type  :text}
+                 {:label   "ENS name"
+                  :key     :ens-name
+                  :type    :text
+                  :suffix  ".eth"}
+                 {:label   "Time"
+                  :key     :time-str
+                  :type    :text
+                  :limit   5}
+                 {:label   "Is contact?"
+                  :key     :is-contact?
+                  :type    :boolean}
+                 {:label   "Is verified?"
+                  :key     :is-verified?
+                  :type    :boolean}
+                 {:label   "Is untrustworthy?"
+                  :key     :is-untrustworthy?
+                  :type    :boolean}])
+
+(defn cool-preview []
+  (let [state (reagent/atom {:profile-name      "Alisher Yakupov"
+                             :nickname          ""
+                             :public-key        "zFfdsfdsjklfsdf"
+                             :time-str          "09:30"
+                             :ens-name          ""
+                             :is-contact?       false
+                             :is-verified?      false
+                             :is-untrustworthy? false})]
+    (fn []
+      [rn/touchable-without-feedback {:on-press rn/dismiss-keyboard!}
+       [rn/view {:padding-bottom 150}
+        [rn/view {:flex 1}
+         [preview/customizer state descriptor]]
+        [rn/view {:padding-vertical 60
+                  :flex-direction   :row
+                  :justify-content  :center}
+         [quo2/author @state]]]])))
+
+(defn preview-author []
+  [rn/view {:background-color (colors/theme-colors colors/white colors/neutral-90)
+            :flex             1}
+   [rn/flat-list {:flex                      1
+                  :keyboardShouldPersistTaps :always
+                  :header                    [cool-preview]
+                  :key-fn                    str}]])
