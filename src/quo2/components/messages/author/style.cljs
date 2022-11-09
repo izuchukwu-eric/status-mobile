@@ -1,28 +1,28 @@
-(ns quo2.components.messages.author.styles
+(ns quo2.components.messages.author.style
   (:require [quo2.foundations.colors :as colors]))
 
 (def container
-  {:flex   1
-   :width  "100%"
-   :height 18
+  {:flex           1
+   :flex-wrap      :wrap
+   :height         18
    :flex-direction :row
    :align-items    :center})
 
-(def ens-text
+(defn ens-text []
   {:color (colors/theme-colors colors/neutral-100 colors/white)})
 
-(def nickname-text
+(defn nickname-text []
   {:color (colors/theme-colors colors/neutral-100 colors/white)})
 
 (def middle-dot-nickname
   {:color             colors/neutral-50
    :margin-horizontal 4})
 
-(def public-key-text
+(def chat-key-text
   {:color       colors/neutral-50
    :margin-left 8})
 
-(def middle-dot-public-key
+(def middle-dot-chat-key
   {:color       colors/neutral-50
    :margin-left 4})
 

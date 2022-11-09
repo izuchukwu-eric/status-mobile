@@ -1,61 +1,65 @@
 (ns quo2.components.messages.author.view
   (:require
-   [quo2.components.messages.author.styles :as styles]
+   [quo2.components.messages.author.style :as style]
    [quo.react-native :as rn]
    [quo2.components.markdown.text :as text]
-   [quo2.foundations.colors :as colors]
-   [quo2.components.icon :as icons]))
+   [quo2.components.icon :as icons]
+   [status-im.utils.utils :as utils]))
 
-(defn author [{:keys [profile-name nickname public-key ens-name time-str is-contact? is-verified? is-untrustworthy?]}]
+(def middle-dot "·")
+
+(defn author [{:keys [profile-name nickname chat-key ens-name time-str is-contact? is-verified? is-untrustworthy?]}]
   [:f>
    (fn []
      (let [is-ens? (> (count ens-name) 0)
            has-nickname? (> (count nickname) 0)]
-       [rn/view {:style styles/container}
+       [rn/view {:style style/container}
         (if is-ens?
           [text/text {:weight :semi-bold
                       :size   :paragraph-2
-                      :color  (colors/theme-colors colors/neutral-100 colors/white)
-                      :style  styles/ens-text}
+                      :style  (style/ens-text)}
            ens-name]
           [:<>
            (when has-nickname?
              [:<>
               [text/text {:weight :semi-bold
                           :size   :paragraph-2
-                          :style  styles/nickname-text}
+                          :style  (style/nickname-text)}
                nickname]
               [text/text {:size  :paragraph-2
-                          :style styles/middle-dot-nickname}
-               "·"]])
+                          :style style/middle-dot-nickname}
+               middle-dot]])
            [text/text {:weight (if has-nickname? :medium :semi-bold)
                        :size   :paragraph-2
-                       :style  (styles/profile-name-text has-nickname?)}
+                       :style  (style/profile-name-text has-nickname?)}
             profile-name]])
         (when is-contact?
-          [icons/icon :main-icons2/contact {:size            12
-                                            :no-color        true
-                                            :container-style styles/icon-container}])
+          [icons/icon :main-icons2/contact
+           {:size            12
+            :no-color        true
+            :container-style style/icon-container}])
         (cond
           is-verified?
-          [icons/icon :main-icons2/verified {:size            12
-                                             :no-color        true
-                                             :container-style styles/icon-container}]
+          [icons/icon :main-icons2/verified
+           {:size            12
+            :no-color        true
+            :container-style style/icon-container}]
           is-untrustworthy?
-          [icons/icon :main-icons2/untrustworthy {:size            12
-                                                  :no-color        true
-                                                  :container-style styles/icon-container}])
+          [icons/icon :main-icons2/untrustworthy
+           {:size            12
+            :no-color        true
+            :container-style style/icon-container}])
         (when-not is-ens?
           [text/text {:monospace true
                       :size      :paragraph-2
-                      :style     styles/public-key-text}
-           public-key])
+                      :style     style/chat-key-text}
+           (utils/get-shortened-address chat-key)])
         (when-not is-ens?
           [text/text {:monospace true
                       :size      :paragraph-2
-                      :style     styles/middle-dot-public-key}
-           "·"])
+                      :style     style/middle-dot-chat-key}
+           middle-dot])
         [text/text {:monospace true
                     :size      :paragraph-2
-                    :style     (styles/time-text is-ens?)}
+                    :style     (style/time-text is-ens?)}
          time-str]]))])

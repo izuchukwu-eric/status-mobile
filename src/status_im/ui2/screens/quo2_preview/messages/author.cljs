@@ -12,8 +12,8 @@
                  {:label "Nickname"
                   :key   :nickname
                   :type  :text}
-                 {:label "Public key"
-                  :key   :public-key
+                 {:label "Chat key"
+                  :key   :chat-key
                   :type  :text}
                  {:label   "ENS name"
                   :key     :ens-name
@@ -36,7 +36,7 @@
 (defn cool-preview []
   (let [state (reagent/atom {:profile-name      "Alisher Yakupov"
                              :nickname          ""
-                             :public-key        "zFfdsfdsjklfsdf"
+                             :chat-key          "zQ3ssgRy5TtB47MMiMKMKaGyaawkCgMqqbrnAUYrZJ1sgt5N"
                              :time-str          "09:30"
                              :ens-name          ""
                              :is-contact?       false
@@ -47,9 +47,10 @@
        [rn/view {:padding-bottom 150}
         [rn/view {:flex 1}
          [preview/customizer state descriptor]]
-        [rn/view {:padding-vertical 60
-                  :flex-direction   :row
-                  :justify-content  :center}
+        [rn/view {:padding-vertical    60
+                  :padding--horizontal 15
+                  :flex-direction      :row
+                  :justify-content     :center}
          [quo2/author @state]]]])))
 
 (defn preview-author []
