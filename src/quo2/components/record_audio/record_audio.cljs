@@ -7,18 +7,6 @@
             [reagent.core :as reagent]
             [cljs-bean.core :as bean]))
 
-(def themes
-  {:light {:icon-color           colors/white
-           :label                {:style    {:color colors/white}}
-           :background-color     {:default  colors/primary-50
-                                  :pressed  colors/primary-60
-                                  :disabled colors/primary-50}}
-   :dark  {:icon-color          colors/white
-           :label               {:style    {:color colors/white}}
-           :background-color    {:default  colors/primary-60
-                                 :pressed  colors/primary-50
-                                 :disabled colors/primary-60}}})
-
 (def recording? (reagent/atom false))
 (def locked? (reagent/atom false))
 (def ready-to-send? (reagent/atom false))
@@ -143,8 +131,9 @@
                                   :z-index         0})
                          :pointer-events :none}
         [:<>
-         (map
-          (fn [animation]
+         (map-indexed
+          (fn [id animation]
+            ^{:key id}
             [animated-ring {:scale   (:scale animation)
                             :opacity (:opacity animation)
                             :color   rings-color}])
