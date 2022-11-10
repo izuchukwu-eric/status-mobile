@@ -26,14 +26,14 @@
   {:color       colors/neutral-50
    :margin-left 4})
 
-(defn profile-name-text [has-nickname?]
-  {:color (if has-nickname?
+(defn profile-name-text [nickname?]
+  {:color (if nickname?
             (colors/theme-colors colors/neutral-60 colors/neutral-40)
             (colors/theme-colors colors/neutral-100 colors/white))})
 
 (def icon-container
   {:margin-left 4})
 
-(defn time-text [is-ens?]
+(defn time-text [ens?]
   {:color       colors/neutral-50
-   :margin-left (if is-ens? 8 4)})
+   :margin-left (if ens? 8 4)})

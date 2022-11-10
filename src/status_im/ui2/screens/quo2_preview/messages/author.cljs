@@ -1,7 +1,7 @@
 (ns status-im.ui2.screens.quo2-preview.messages.author
-  (:require [quo.react-native :as rn]
+  (:require [react-native.core :as rn]
             [quo2.foundations.colors :as colors]
-            [quo.previews.preview :as preview]
+            [status-im.ui2.screens.quo2-preview.preview :as preview]
             [quo2.components.messages.author.view :as quo2]
             [reagent.core :as reagent]))
 
@@ -15,33 +15,33 @@
                  {:label "Chat key"
                   :key   :chat-key
                   :type  :text}
-                 {:label   "ENS name"
-                  :key     :ens-name
-                  :type    :text
-                  :suffix  ".eth"}
-                 {:label   "Time"
-                  :key     :time-str
-                  :type    :text
-                  :limit   5}
-                 {:label   "Is contact?"
-                  :key     :is-contact?
-                  :type    :boolean}
-                 {:label   "Is verified?"
-                  :key     :is-verified?
-                  :type    :boolean}
-                 {:label   "Is untrustworthy?"
-                  :key     :is-untrustworthy?
-                  :type    :boolean}])
+                 {:label  "ENS name"
+                  :key    :ens-name
+                  :type   :text
+                  :suffix ".eth"}
+                 {:label "Time"
+                  :key   :time-str
+                  :type  :text
+                  :limit 5}
+                 {:label "Is contact?"
+                  :key   :contact?
+                  :type  :boolean}
+                 {:label "Is verified?"
+                  :key   :verified?
+                  :type  :boolean}
+                 {:label "Is untrustworthy?"
+                  :key   :untrustworthy?
+                  :type  :boolean}])
 
 (defn cool-preview []
-  (let [state (reagent/atom {:profile-name      "Alisher Yakupov"
-                             :nickname          ""
-                             :chat-key          "zQ3ssgRy5TtB47MMiMKMKaGyaawkCgMqqbrnAUYrZJ1sgt5N"
-                             :time-str          "09:30"
-                             :ens-name          ""
-                             :is-contact?       false
-                             :is-verified?      false
-                             :is-untrustworthy? false})]
+  (let [state (reagent/atom {:profile-name   "Alisher Yakupov"
+                             :nickname       ""
+                             :chat-key       "zQ3ssgRy5TtB47MMiMKMKaGyaawkCgMqqbrnAUYrZJ1sgt5N"
+                             :time-str       "09:30"
+                             :ens-name       ""
+                             :contact?       false
+                             :verified?      false
+                             :untrustworthy? false})]
     (fn []
       [rn/touchable-without-feedback {:on-press rn/dismiss-keyboard!}
        [rn/view {:padding-bottom 150}

@@ -138,3 +138,10 @@
   Similar to group-by except that the map values are single objects (depends on key uniqueness)."
   [key coll]
   (into {} (map #(vector (key %) %) coll)))
+
+(defn get-shortened-address
+  "Takes first and last 4 digits from address including leading 0x
+  and adds unicode ellipsis in between"
+  [address]
+  (when address
+    (str (subs address 0 6) "\u2026" (subs address (- (count address) 3) (count address)))))
