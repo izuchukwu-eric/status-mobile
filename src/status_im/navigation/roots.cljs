@@ -20,7 +20,8 @@
    :title {:color colors/black}
    :rightButtonColor colors/black
    :background {:color colors/white}
-   :backButton {:icon  (icons/icon-source :main-icons/arrow-left)
+   :backButton {:testID :back-button
+                :icon  (icons/icon-source :main-icons/arrow-left)
                 :color colors/black}})
 
 (defn bottom-tab-general [icon accessibility]
