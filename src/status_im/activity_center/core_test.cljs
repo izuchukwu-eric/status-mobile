@@ -83,16 +83,15 @@
     (testing "logs failure"
       (rf-test/run-test-sync
        (setup)
-       (let [contact-verification-id 666]
+       (let [notification-id 666]
          (h/using-log-test-appender
           (fn [logs]
             (h/stub-fx-with-callbacks ::json-rpc/call :on-error (constantly :fake-error))
 
-            (rf/dispatch [:activity-center.contact-verification/decline contact-verification-id])
+            (rf/dispatch [:activity-center.contact-verification/decline notification-id])
 
-            (is (= {:args  ["Failed to decline contact verification"
-                            {:contact-verification-id contact-verification-id
-                             :error                   :fake-error}]
+            (is (= {:args  ["Failed to process notification :contact-verification/decline"
+                            {:notification-id notification-id :error :fake-error}]
                     :level :warn}
                    (last @logs))))))))))
 
