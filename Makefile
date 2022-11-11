@@ -313,7 +313,18 @@ test: ##@test Run tests once in NodeJS
 	yarn shadow-cljs compile test && \
 	node --require ./test-resources/override.js target/test/test.js
 
-#--------------
+component-test-watch: export TARGET := clojure
+component-test-watch: ##@ Watch tests and re-run no changes to cljs files
+	yarn install
+	nodemon --exec 'yarn shadow-cljs compile component-test && jest' -e cljs
+
+component-test: export TARGET := clojure
+component-test: ##@test Run tests once in NodeJS
+	# Here we creates the gyp bindings for nodejs
+	yarn install
+	yarn shadow-cljs compile component-test && \
+	jest
+
 # Other
 #--------------
 
