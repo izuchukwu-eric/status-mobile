@@ -26,6 +26,8 @@ abstract_target 'Status' do
 
   target 'StatusIm' do
 
+    pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
     target 'StatusImTests' do
       inherit! :complete
       # Pods for testing
