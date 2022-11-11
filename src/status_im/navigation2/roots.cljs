@@ -6,9 +6,9 @@
   (if platform/android?
     {:navigationBar {:backgroundColor colors/neutral-100}
      :statusBar     {:backgroundColor :transparent
-                     :style           :light
+                     :style           (if (colors/dark?) :light :dark)
                      :drawBehind      true}}
-    {:statusBar {:style :light}}))
+    {:statusBar {:style (if (colors/dark?) :light :dark)}}))
 
 (defn roots []
   {:shell-stack
