@@ -4,6 +4,8 @@
             [status-im.utils.handlers :refer [<sub]]
             [status-im.utils.platform :as platform]))
 
+(def shell-animation-time 250)
+
 (defn bottom-tabs-container-height []
   (if platform/android? 57 82))
 

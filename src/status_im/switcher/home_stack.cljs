@@ -58,4 +58,4 @@
          {:jump-to {:on-press #(animation/close-home-stack shared-values)
                     :label (i18n/label :t/jump-to)}}
          {:position :absolute
-          :bottom   12}]]))])
+          :bottom   7}]]))])

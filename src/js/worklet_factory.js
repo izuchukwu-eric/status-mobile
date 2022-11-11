@@ -50,11 +50,13 @@ export function stackPointer (stackId, selectedStackId) {
   );
 }
 
-export function bottomTabIconColor (stackId, selectedStackId, passThrough, selectedTabColor, defaultColor, passThroughColor) {
+export function bottomTabIconColor (stackId, selectedStackId, homeStackOpen,
+				    passThrough, selectedTabColor, defaultColor,
+				    passThroughColor) {
   return useDerivedValue(
     function () {
       'worklet'
-      if (selectedStackId.value == stackId){
+      if (selectedStackId.value == stackId && homeStackOpen.value){
 	return selectedTabColor;
       }
       else if (passThrough.value){
@@ -70,8 +72,10 @@ export function bottomTabIconColor (stackId, selectedStackId, passThrough, selec
 
 // Home Stack
 
+const shellAnimationTime = 250;
+
 const defaultDurationAndEasing = {
-  duration: 300,
+  duration: shellAnimationTime,
   easing: Easing.bezier(0, 0, 1, 1),
 }
 
@@ -124,7 +128,13 @@ export function homeStackScale (homeStackOpen, minimizeScale) {
   return useDerivedValue(
     function () {
       'worklet'
-      return withTiming(homeStackOpen.value ? 1 : minimizeScale, defaultDurationAndEasing);
+      var homeStackOpenValue = homeStackOpen.value;
+      return withTiming(
+	homeStackOpenValue ? 1 : minimizeScale,
+	{
+	  duration: shellAnimationTime,
+	  easing: Easing.bezier(homeStackOpenValue ? 0 : 0.25, 0, 1, 1),
+	});
     }
   );
 }
