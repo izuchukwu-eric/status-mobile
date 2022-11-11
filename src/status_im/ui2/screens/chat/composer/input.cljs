@@ -90,7 +90,7 @@
               :end   end}
              mentionable-users]))))
 
-(defn on-change [last-text-change timeout-id mentionable-users refs chat-id sending-image args]
+(defn on-change [last-text-change timeout-id mentionable-users refs chat-id sending-image edit-message args]
   (let [text (.-text ^js (.-nativeEvent ^js args))
         prev-text (get @input-texts chat-id)]
     (when (and (seq prev-text) (empty? text) (not sending-image))
@@ -140,6 +140,7 @@
 (defn text-input [{:keys [set-active-panel refs chat-id sending-image on-content-size-change]}]
   (let [cooldown-enabled? (<sub [:chats/current-chat-cooldown-enabled?])
         mentionable-users (<sub [:chats/mentionable-users])
+        edit-message (<sub [:chats/edit-message])
         timeout-id (atom nil)
         last-text-change (atom nil)
         mentions-enabled (get @mentions-enabled chat-id)]
@@ -166,7 +167,7 @@
       :spell-check              false
       :on-content-size-change   on-content-size-change
       :on-selection-change      (partial on-selection-change timeout-id last-text-change mentionable-users)
-      :on-change                (partial on-change last-text-change timeout-id mentionable-users refs chat-id sending-image)
+      :on-change                (partial on-change last-text-change timeout-id mentionable-users refs chat-id sending-image edit-message)
       :on-text-input            (partial on-text-input mentionable-users chat-id)}
      (if mentions-enabled
        (for [[idx [type text]] (map-indexed
