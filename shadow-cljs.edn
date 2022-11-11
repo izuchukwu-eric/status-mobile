@@ -108,9 +108,9 @@
            :compiler-options {:optimizations :simple
                               :source-map false}}
           :component-test {:target :npm-module
-                           :entries [quo2.components.selectors.--tests--.selectors-component-test]
-                           :ns-regexp "-component-test$"
-                           :output-dir "component-test"
+                           :entries [quo2.components.selectors.--tests--.selectors-component-spec]
+                           :ns-regexp "-component-spec$"
+                           :output-dir "component-spec"
                            :closure-defines
                            {quo2.components.icons.icons/__TEST__ true}
                            :compiler-options {:warnings-as-errors false
