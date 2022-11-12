@@ -3,7 +3,7 @@
     "_comment": "Instead use: scripts/update-status-go.sh <rev>",
     "owner": "status-im",
     "repo": "status-go",
-    "version": "91aac3cec0c1d74f09cf8d108105ba311552723d",
-    "commit-sha1": "91aac3cec0c1d74f09cf8d108105ba311552723d",
-    "src-sha256": "0j9vl7alb4rf3zk0bak12s3bdfwgih4fq9yaw7wkinmz03rqx2wg"
+    "version": "fix/14245-parametrize-notification-status-rpc",
+    "commit-sha1": "79f11c57c5ef686009a927427494c374e0ca8f3a",
+    "src-sha256": "08yga7l8kazbwsbzpqsqp4b91bq4l4kfddw4xp3w82wifkl2ps2c"
 }
